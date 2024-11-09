@@ -1,0 +1,4 @@
+.env
+node_modules
+results.txt
+cover_images/*
