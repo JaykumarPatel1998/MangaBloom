@@ -1,0 +1,11 @@
+<!-- views/pages/home.ejs -->
+<h1>Welcome to MangaBloom</h1>
+<p>Your hub for manga reading!</p>
+
+<ul>
+  <% mangas.forEach(manga => { %>
+    <li>
+      <a href="/manga/<%= manga.id %>"><%= manga.title %></a>
+    </li>
+  <% }) %>
+</ul>
