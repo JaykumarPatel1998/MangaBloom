@@ -1,4 +1,4 @@
 .env
 node_modules
 results.txt
-cover_images/*
+seedDB/cover_images/*
