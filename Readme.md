@@ -34,10 +34,12 @@ Now that we have got constraints out of the way, let's take some technical decis
         ![image.png](markdown/image.png)
         
 3. Cover Images - Should I download the cover images and keep them hot and ready for access or query them each time upon client request and waste precious API rate limit bandwidth? I think I should host them myself - but I don't want to keep them in a separate file storage solution like S3 as it introduces another service in the equation and it's a bit costly. I can host the cover images on the application server. let’s calculate the memory estimates: 
-`one cover image size = ~40KB
+```code
+one cover image size = ~40KB
 assume that we generate a smaller image thumbnail whose size = ~4KB
 number of covers = ~80,000
-memory occupied = (40 + 4) * 80000 = ~3.5GB`
+memory occupied = (40 + 4) * 80000 = ~3.5GB
+```
 Now 3.5GB of data is not a lot considering AWS gives 30GB of disk space in the free tier and disk IO would not be that much of a cost since the thumbnail would be served most of the time. I understand the implications this decision has on the horizontal scalability of the system and it tightly couples the system but I would like to first reach that bottleneck and then address it.
 
 ![image.png](markdown/image%201.png)
@@ -45,13 +47,15 @@ Now 3.5GB of data is not a lot considering AWS gives 30GB of disk space in the f
 1. Chapter Pages - serving chapter pages is the hardest thing for me to figure out. They are very dynamic and they keep changing periodically as new chapters are added/updated. Leaving these incremental updates aside, the sheer size/volume of manga episodes is not something I am prepared to host on my own server and neither I am willing to outsource file handling to a managed service like S3 because I get the feeling that I am reinventing the wheel by doing that and over-engineering for a product in its MVP phase. Some back-of-the-envelope calculations for a popular manga series *ONE PIECE*
     
     ![image.png](markdown/image%202.png)
-    
+
+```code
     current number of chapters: 1100
     average pages per chapter: 18
     total pages: 18 * 1100 = 19,800 pages
     average page size for a high-quality image: 600KB
     total storage requirement: 19800 * 600KB = ~11.8GB
     11.8GB !! just for 1 manga, I will admit all mangas are not as big as one piece but still, we are looking at big numbers.
+```
 
 ## Credits
 
