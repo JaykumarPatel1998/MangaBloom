@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS titles (
     id SERIAL PRIMARY KEY,
     manga_id UUID REFERENCES manga(id) ON DELETE CASCADE,
     language_code VARCHAR(10),                -- Language code for the title (e.g., 'en', 'ja')
-    title TEXT NOT NULL                       -- Title text
+    title TEXT                      -- Title text
 );
 `;
 const CREATE_DESCRIPTION_TABLE_SQL = `
@@ -98,6 +98,24 @@ CREATE TABLE IF NOT EXISTS manga_tags (
 );
 `;
 
+const CREATE_MANGA_CHAPTERS_TABLE_SQL = `
+CREATE TABLE IF NOT EXISTS chapters (
+  id UUID PRIMARY KEY,
+  manga_id UUID REFERENCES manga(id) ON DELETE CASCADE,
+  volume text,
+  chapter text,
+  title VARCHAR(255),
+  translated_language VARCHAR(50),
+  external_url VARCHAR(255),
+  publish_at TIMESTAMP,
+  readable_at TIMESTAMP,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  pages INT,
+  version INT
+);
+`
+
 // PostgreSQL connection setup
 const pool = new Pool({
   user: "postgres",
@@ -139,14 +157,11 @@ async function fetchMangaList(page = 1) {
   }
 }
 
-
-
 //create a key value pair of mangaId:coverId for later fetching cover images
 async function appendCoverIdToFile(mangaId, coverId) {
   const pair = `${mangaId},${coverId}\n`;
   await fs.appendFile(path.join(__dirname, 'cover_images/', 'cover_images.txt'), pair, 'utf8')
 }
-
 
 // Insert manga details, titles, and tags
 async function insertManga(manga, client) {
@@ -252,6 +267,8 @@ async function insertManga(manga, client) {
       }
     }
 
+    await fetchAndPopulateChapters(manga.id, client)
+
     await client.query("COMMIT");
     console.log(`Inserted manga ${manga.attributes.title?.en}\n`);
   } catch (error) {
@@ -329,6 +346,110 @@ async function seedDatabase(client) {
   console.log("Database seeding complete.");
 }
 
+// Function to insert a chapter into the database
+async function insertChapterIntoDb(chapter, client) {
+  const query = `
+      INSERT INTO chapters (id, manga_id, volume, chapter, title, translated_language, external_url,
+                            publish_at, readable_at, created_at, updated_at, pages, version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+  `;
+
+  const values = [
+      chapter.id,
+      chapter.manga_id,
+      chapter.volume,
+      chapter.chapter,
+      chapter.title,
+      chapter.translated_language,
+      chapter.external_url,
+      chapter.publish_at,
+      chapter.readable_at,
+      chapter.created_at,
+      chapter.updated_at,
+      chapter.pages,
+      chapter.version
+  ];
+
+  try {
+      await client.query(query, values);
+  } catch (err) {
+      console.error('Error inserting chapter into DB:', err);
+      process.exit(0)
+  }
+}
+
+// Function to fetch chapters and populate the database
+async function fetchAndPopulateChapters(mangaId, client) {
+  const baseUrl = `${mangaDexAPI}/manga/${mangaId}/feed`; // Replace with the actual API base URL
+  const limit = 500;  // Number of chapters to fetch per request
+  let offset = 0;  // Starting offset
+  let total = 0;  // Total number of chapters (to keep track of completion)
+  let fetchedChapters = 0;
+  console.log("inserting chapters for mangaId : ", mangaId)
+
+  // Fetch chapters until the offset exceeds total
+  while (fetchedChapters < total || total === 0) {
+      try {
+          // Making the API request with limit and offset
+          const response = await axios.get(baseUrl, {
+              params: {
+                  limit: limit,
+                  offset: offset,
+                  includeFuturePublishAt: 0, // Default filter: only past chapters
+                  includeEmptyPages: 0,
+                  includeExternalUrl: 0,
+              }
+          });
+
+          const { data } = response.data;
+          const chapters = data;  // Assuming the response has a chapters field with the list of chapters
+
+          if (chapters.length === 0) {
+              console.log('No chapters returned.');
+              break;
+          }
+
+          // Insert chapters into the database
+          for (const chapter of chapters) {
+              const chapterData = {
+                  id: chapter.id,
+                  manga_id: mangaId,
+                  volume: chapter.attributes.volume,
+                  chapter: chapter.attributes.chapter,
+                  title: chapter.attributes.title,
+                  translated_language: chapter.attributes.translatedLanguage,
+                  external_url: chapter.attributes.externalUrl,
+                  publish_at: chapter.attributes.publishAt,
+                  readable_at: chapter.attributes.readableAt,
+                  created_at: chapter.attributes.createdAt,
+                  updated_at: chapter.attributes.updatedAt,
+                  pages: chapter.attributes.pages,
+                  version: chapter.attributes.version
+              };
+
+              await insertChapterIntoDb(chapterData, client);
+          }
+
+          // Update the total number of chapters and fetched chapters
+          total = response.data.total;
+          fetchedChapters += chapters.length;
+
+          // Update offset for the next page of results
+          offset += limit;
+
+          console.log(`Fetched ${fetchedChapters} of ${total} chapters`);
+
+          // Implementing rate limiting (5 requests per second)
+          console.log('Sleeping for 200ms to respect rate limit...');
+          await sleep(200); // Sleep for 0.2 seconds to ensure 5 req/s
+
+      } catch (error) {
+          console.error('Error fetching chapters:', error);
+          break;
+      }
+  }
+}
+
 (async () => {
   const client = await pool.connect();
 
@@ -344,6 +465,7 @@ async function seedDatabase(client) {
     await client.query(CREATE_COVER_IMAGE_TABLE_SQL);
     await client.query(CREATE_TAGS_TABLE_SQL);
     await client.query(CREATE_MANGA_TAGS_TABLE_SQL);
+    await client.query(CREATE_MANGA_CHAPTERS_TABLE_SQL);
     console.log("Schema Created 💚");
 
     seedDatabase(client).catch((error) =>

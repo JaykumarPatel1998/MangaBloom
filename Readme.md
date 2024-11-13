@@ -12,12 +12,12 @@ ___  ___                       ______ _
                     |___/                                     
 ```
 
-Hey readers, I am creating a manga-binging application for manga/comic **(Japanese Translation: まんが)** fans like myself.  Let’s be real here for a moment,  all of us have tried to read manga on those shady manga websites - yes, the ones where you watch ads more than you read manga. I have grown tired of those and I suspect so have most of you. I bring to you Manga Bloom - It is an ad-free manga-binging application that is built around an open-source Manga API - [MangaDex](https://api.mangadex.org/docs/) and here is how I built it.
+Hey readers, MangaBloom is a manga-binging application for manga/comic **(Japanese Translation: まんが)** fans like myself.  Let’s be real here for a moment,  all of us have tried to read manga on those shady manga websites - yes, the ones where you watch ads more than you read manga. I have grown tired of those and I suspect so have most of you. I bring to you Manga Bloom - It is an ad-free manga-binging application that is built around an open-source Manga API - [MangaDex](https://api.mangadex.org/docs/) and here is how I built it.
 
 There are some constraints we have to address to be a good citizen of the open-source world and respect MangaDex’s terms of usage
 
 1. Credit them - Huge thanks to MangaDex and Scanlation groups for their contribution - us otakus are grateful.
-2. No Ads/Paid Service allowed - we have to figure out a business model to keep the app running - Donations maybe? or maybe we will sell printed Naruto T-shirts, who knows?
+2. No Ads/Paid Service allowed - we have to figure out some kind of money making model to keep the app running - Donations maybe? or maybe we will sell printed Naruto T-shirts, who knows?
 3. API rate limit - A strict API rate limit of 5 Requests/sec for all of their APIs - the ones that are serving manga metadata (title, description, chapters, cover pages, artists, authors, tags) and the ones serving digital pages for a given manga. Many of you would question - why not look for a different API that has elevated rate limits. Well, there aren’t any, and web scraping for manga is illegal !!
 4. Proxy Requests - MangaDex would not accept any cross-origin requests from our browser client and our server has to proxy client requests to their server. If you are not the brightest apple in the bunch like me, here’s an example of what I just said- If a browser client requests a manga page from our server, we cannot simply provide them MangaDex’s image URL, we would have to download the image on our server and serve the client with the image. 
 
@@ -26,6 +26,22 @@ There are some constraints we have to address to be a good citizen of the open-s
 Now that we have got constraints out of the way, let's take some technical decisions, shall we? which I am lowkey sure will come back to bite me later
 
 1. Language - My Programming language of choice is NodeJS because it is asynchronous, non-main-thread-blocking, event-driven, designed to build scalable network applications, yada, yada, yada - you know how it goes 😅.
+**Edit 1** : Now that I have started experimenting and running some concurrency tests, Node JS is not working as good as I expected. I ran some concurrency tests using Autocannon and CPU/memory profiling on a NodeJS API (my use case - some Database querying, error handling and some list traversal and manipulation), and guess what? it was very easy for node api to memory leak, it just consumes too much memory!!. I also tried utilizing all cores of my CPU by using PM2 clustering, but still it was no good. I figure vertical/horizontal scaling would address this issue, but I am working with limited $$$. I will be running some tests with Java (😭) or Go maybe?
+
+Here are the results for Node Concurrency Test:
+1000 connections for 10 seconds without clustering enabled (single process)
+Total : 9K requests made, no Errors
+Avg latency = 1272.39 ms
+Avg Req/sec = 750.5
+Avg Bytes Transferred / sec = 1.33 MB 
+
+1000 connections for 10 seconds with clustering enabled (PM2)
+Total : 15K requests made, no Errors
+Avg latency = 713 ms
+Avg Req/sec = 1400.4
+Avg Bytes Transferred / sec = 2.48 MB
+
+
 2. Database - Now technically, we could work without an actual database since our data is managed by MangaDex but that rate limit of 5 req/sec hurts a bit and is a bottleneck we have to address before we design our app. There are many solutions to this problem, one I could come up with is as follows:
     1. The first step is to identify the data that is going to be accessed the most. As a manga-binging veteran, I suspect it is going to be the metadata about the manga than the actual manga pages.
     2. The second step is that we need to seed our local database with manga metadata. This should relieve us significantly from the API rate limit.  Unfortunately, this means we have to manage the data ourselves and keep taking periodic updates from the MangaDex API but, given our circumstances, I am willing to take my chances.
@@ -63,13 +79,6 @@ MangaBloom was made possible with support from the following:
 
 - **[MangaDex](https://mangadex.org/)**: Our primary source for manga metadata, tags, genres, cover images, and other information. We greatly appreciate their comprehensive API and community-driven platform, which allows us to access a wealth of manga content.
 - **MangaDex API Documentation**: Thanks to the detailed and well-organized API documentation provided by MangaDex, which helped us seamlessly integrate their data into MangaBloom.
-  
-**Additional Tools and Libraries**:
-
-- **Node.js** and **Express**: For backend server logic and handling requests efficiently.
-- **PostgreSQL**: Our database solution for managing manga metadata, tags, and relationships.
-- **Templating Engine** (such as EJS, Handlebars, or Pug): Used to deliver a dynamic, fast-loading user interface.
-- **Docker**: For containerized deployment, making MangaBloom scalable and easy to manage.
 
 **Acknowledgments**:
 
