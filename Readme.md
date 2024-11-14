@@ -28,6 +28,7 @@ Now that we have got constraints out of the way, let's take some technical decis
 1. Language - My Programming language of choice is NodeJS because it is asynchronous, non-main-thread-blocking, event-driven, designed to build scalable network applications, yada, yada, yada - you know how it goes 😅.
 **Edit 1** : Now that I have started experimenting and running some concurrency tests, Node JS is not working as good as I expected. I ran some concurrency tests using Autocannon and CPU/memory profiling on a NodeJS API (my use case - some Database querying, error handling and some list traversal and manipulation), and guess what? it was very easy for node api to memory leak, it just consumes too much memory!!. I also tried utilizing all cores of my CPU by using PM2 clustering, but still it was no good. I figure vertical/horizontal scaling would address this issue, but I am working with limited $$$. I will be running some tests with Java (😭) or Go maybe?
 
+``plaintext
 Here are the results for Node Concurrency Test:(with clustering enabled PM2)
 Concurrency Level:      10000, 1 req each connection
 Time taken for tests:   24.770 seconds
@@ -46,9 +47,11 @@ Connect:        0    2  30.9      0     516
 Processing:  1401 12624 6676.4  12231   24001
 Waiting:        5 11846 6856.7  11414   23641
 Total:       1401 12626 6676.4  12231   24001
+```
 
 **Edit 2** : I did same tests for Go API
 
+```plaintext
 Concurrency Level:      10000
 Time taken for tests:   6.862 seconds
 Complete requests:      10000
@@ -66,7 +69,7 @@ Connect:        0    0  10.2      0     514
 Processing:  1039 2956 1121.9   2856    5389
 Waiting:       20 2610 1093.6   2339    5384
 Total:       1039 2956 1122.1   2856    5389
-
+```
 
 
 2. Database - Now technically, we could work without an actual database since our data is managed by MangaDex but that rate limit of 5 req/sec hurts a bit and is a bottleneck we have to address before we design our app. There are many solutions to this problem, one I could come up with is as follows:
