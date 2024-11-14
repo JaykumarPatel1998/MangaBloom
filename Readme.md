@@ -26,6 +26,7 @@ There are some constraints we have to address to be a good citizen of the open-s
 Now that we have got constraints out of the way, let's take some technical decisions, shall we? which I am lowkey sure will come back to bite me later
 
 1. Language - My Programming language of choice is NodeJS because it is asynchronous, non-main-thread-blocking, event-driven, designed to build scalable network applications, yada, yada, yada - you know how it goes 😅.
+
 **Edit 1** : Now that I have started experimenting and running some concurrency tests, Node JS is not working as good as I expected. I ran some concurrency tests using Autocannon and CPU/memory profiling on a NodeJS API (my use case - some Database querying, error handling and some list traversal and manipulation), and guess what? it was very easy for node api to memory leak, it just consumes too much memory!!. I also tried utilizing all cores of my CPU by using PM2 clustering, but still it was no good. I figure vertical/horizontal scaling would address this issue, but I am working with limited $$$. I will be running some tests with Java (😭) or Go maybe?
 
 ```plaintext
@@ -72,6 +73,26 @@ Waiting:       20 2610 1093.6   2339    5384
 Total:       1039 2956 1122.1   2856    5389
 ```
 
+```plaintext
+Concurrency Level:      10000
+Time taken for tests:   49.226 seconds
+Complete requests:      100000
+Failed requests:        0
+Total transferred:      229400000 bytes
+HTML transferred:       220600000 bytes
+Requests per second:    2031.45 [#/sec] (mean)
+Time per request:       4922.593 [ms] (mean)
+Time per request:       0.492 [ms] (mean, across all concurrent requests)
+Transfer rate:          4550.92 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   6.3      0     627
+Processing:   231 4651 2916.2   4099   32239
+Waiting:        1 3834 2947.0   2989   32130
+Total:        232 4651 2916.2   4100   32240
+```
+
 
 2. Database - Now technically, we could work without an actual database since our data is managed by MangaDex but that rate limit of 5 req/sec hurts a bit and is a bottleneck we have to address before we design our app. There are many solutions to this problem, one I could come up with is as follows:
     1. The first step is to identify the data that is going to be accessed the most. As a manga-binging veteran, I suspect it is going to be the metadata about the manga than the actual manga pages.
@@ -91,7 +112,7 @@ Now 3.5GB of data is not a lot considering AWS gives 30GB of disk space in the f
 
 ![image.png](markdown/image%201.png)
 
-1. Chapter Pages - serving chapter pages is the hardest thing for me to figure out. They are very dynamic and they keep changing periodically as new chapters are added/updated. Leaving these incremental updates aside, the sheer size/volume of manga episodes is not something I am prepared to host on my own server and neither I am willing to outsource file handling to a managed service like S3 because I get the feeling that I am reinventing the wheel by doing that and over-engineering for a product in its MVP phase. Some back-of-the-envelope calculations for a popular manga series *ONE PIECE*
+4. Chapter Pages - serving chapter pages is the hardest thing for me to figure out. They are very dynamic and they keep changing periodically as new chapters are added/updated. Leaving these incremental updates aside, the sheer size/volume of manga episodes is not something I am prepared to host on my own server and neither I am willing to outsource file handling to a managed service like S3 because I get the feeling that I am reinventing the wheel by doing that and over-engineering for a product in its MVP phase. Some back-of-the-envelope calculations for a popular manga series *ONE PIECE*
     
     ![image.png](markdown/image%202.png)
 
