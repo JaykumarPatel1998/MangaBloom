@@ -1,0 +1,23 @@
+// package main
+
+// import (
+// 	"context"
+// 	"fmt"
+// 	"time"
+// )
+
+// func executeTask(ctx context.Context) {
+// 	select {
+// 	case <-time.After(time.Second * 6):
+// 		fmt.Println("done sleeping!!")
+// 	case <-ctx.Done():
+// 		fmt.Println("ctx cancelled :", ctx.Err())
+// 	}
+// }
+
+// func main() {
+// 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*4)
+// 	defer cancel()
+
+// 	executeTask(ctx)
+// }

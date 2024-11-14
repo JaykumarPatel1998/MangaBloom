@@ -2,5 +2,4 @@
 node_modules
 results.txt
 seedDB/cover_images/*
-concurrency_tests/*
-concurrency_tests/
+**/node_modules/
