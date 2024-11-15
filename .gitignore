@@ -3,3 +3,4 @@ node_modules
 results.txt
 seedDB/cover_images/*
 **/node_modules/
+**/*.exe
