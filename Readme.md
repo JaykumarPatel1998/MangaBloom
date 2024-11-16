@@ -12,6 +12,9 @@ ___  ___                       ______ _
                     |___/                                     
 ```
 
+## Disclaimer
+please note that this is not a refined documentation you will find on every refined github public repo, but these are just my dev logs and notes about my experience with this project
+
 Hey readers, MangaBloom is a manga-binging application for manga/comic **(Japanese Translation: まんが)** fans like myself.  Let’s be real here for a moment,  all of us have tried to read manga on those shady manga websites - yes, the ones where you watch ads more than you read manga. I have grown tired of those and I suspect so have most of you. I bring to you Manga Bloom - It is an ad-free manga-binging application that is built around an open-source Manga API - [MangaDex](https://api.mangadex.org/docs/) and here is how I built it.
 
 There are some constraints we have to address to be a good citizen of the open-source world and respect MangaDex’s terms of usage

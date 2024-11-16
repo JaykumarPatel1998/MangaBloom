@@ -12,8 +12,7 @@ import (
 
 var db *sql.DB
 
-func seedDatabase() {
-
+func main() {
 	godotenv.Load(".env")
 	db_url := os.Getenv("DB_URL")
 	if db_url == "" {
@@ -33,11 +32,10 @@ func seedDatabase() {
 	var migration_table MigrationTable
 	fmt.Println("migration starts: ", migration_table)
 	MigrationStart(&migration_table)
+
+	//TODO : migration code will eventually go here
+
 	MigrationEnd(&migration_table)
 	fmt.Println("migration ends: ", migration_table)
 	fmt.Printf("migration took %v milliseconds", migration_table.MigrationEnd.Time.UnixMilli()-migration_table.MigrationBegin.Time.UnixMilli())
-}
-
-func main() {
-	seedDatabase()
 }
