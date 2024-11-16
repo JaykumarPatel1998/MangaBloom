@@ -135,3 +135,13 @@ MangaBloom was made possible with support from the following:
 **Acknowledgments**:
 
 A big thank you to the open-source community for their continued contributions to making tools like MangaDex, PostgreSQL, and templating engines freely available and well-maintained. Their work helps power countless projects and provides the foundation for new creations like MangaBloom.
+
+
+
+## Dev Logs
+[15-11-2024]
+I don't think its a good idea to store the chapter urls inside the database as chapter urls are msotly CDN delivered and are guaranteed to stay same for atleast 15 minutes -> really transient data to be updated every 15 minutes
+
+I am learning these new things about database migration, came across these really good libraries 
+1. sqlc - sqlc compiles sql schema and queries to type safe Go Code, essentially to structs and functions
+2. goose - handles migrations in the sequence we label our migration files (DDL goes here)

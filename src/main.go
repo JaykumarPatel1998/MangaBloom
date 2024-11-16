@@ -1,53 +1,43 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
-func main() {
-	fmt.Println("Hello form RSS aggregator v2")
+var db *sql.DB
+
+func seedDatabase() {
 
 	godotenv.Load(".env")
-
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		log.Fatal("PORT is not found in the environment")
+	db_url := os.Getenv("DB_URL")
+	if db_url == "" {
+		log.Fatal("msising db_url")
 	}
 
-	router := chi.NewRouter()
-
-	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"*"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
-		MaxAge:           300,
-	}))
-
-	v1Router := chi.NewRouter()
-	v1Router.Get("/ready", handlerReadiness)
-	v1Router.Get("/err", handlerError)
-
-	router.Mount("/v1", v1Router)
-
-	server := &http.Server{
-		Handler: router,
-		Addr:    ":" + port,
-	}
-
-	log.Printf("server starting on port %v", port)
-	err := server.ListenAndServe()
+	var err error
+	db, err = sql.Open("postgres", db_url)
 	if err != nil {
-		log.Fatal("Error detected while starting server ", err)
+		log.Fatalf("failed to connect to database : %v", err)
 	}
 
+	db.SetMaxOpenConns(20)
+	db.SetConnMaxLifetime(0)
+	db.SetMaxIdleConns(5)
+
+	var migration_table MigrationTable
+	fmt.Println("migration starts: ", migration_table)
+	MigrationStart(&migration_table)
+	MigrationEnd(&migration_table)
+	fmt.Println("migration ends: ", migration_table)
+	fmt.Printf("migration took %v milliseconds", migration_table.MigrationEnd.Time.UnixMilli()-migration_table.MigrationBegin.Time.UnixMilli())
+}
+
+func main() {
+	seedDatabase()
 }
