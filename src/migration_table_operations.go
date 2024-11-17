@@ -11,6 +11,7 @@ func MigrationStart(migration_table *MigrationTable) {
 	if err != nil {
 		log.Fatal("could not start the migration", err)
 	}
+	defer rows.Close()
 	handleRowScanning(rows, migration_table)
 }
 
@@ -19,6 +20,7 @@ func MigrationEnd(migration_table *MigrationTable) {
 	if err != nil {
 		log.Fatal("could not end the migration", err)
 	}
+	defer rows.Close()
 	handleRowScanning(rows, migration_table)
 }
 
