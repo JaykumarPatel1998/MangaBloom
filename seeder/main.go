@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/JaykumarPatel1998/MangaBloom/seeder/internal/database"
+	"github.com/JaykumarPatel1998/MangaBloom/seeder/database"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
