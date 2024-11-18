@@ -18,10 +18,9 @@ SELECT
     m.title AS manga_title,
     m.original_language,
     m.status,
-    m.year,
-    STRING_AGG(t.title || ' (' || t.language_code || ')', ', ') AS alternate_titles,
-    STRING_AGG(a.name, ', ') AS author_names,
-    STRING_AGG(ar.name, ', ') AS artist_names
+    t.title AS alternate_title,
+    a.name AS author_name,
+    ar.name AS artist_name
 FROM 
     manga m
 LEFT JOIN titles t ON m.id = t.manga_id
@@ -29,10 +28,8 @@ LEFT JOIN manga_authors ma ON m.id = ma.manga_id
 LEFT JOIN authors a ON ma.author_id = a.id
 LEFT JOIN manga_artists mar ON m.id = mar.manga_id
 LEFT JOIN artists ar ON mar.artist_id = ar.id
-GROUP BY 
-    m.id, m.title, m.original_language, m.status, m.year
 ORDER BY 
-    m.title
+    m.title, t.language_code, a.name, ar.name
 `
 
 type GetMangaDetailsRow struct {
@@ -40,10 +37,9 @@ type GetMangaDetailsRow struct {
 	MangaTitle       sql.NullString
 	OriginalLanguage sql.NullString
 	Status           sql.NullString
-	Year             sql.NullInt32
-	AlternateTitles  []byte
-	AuthorNames      []byte
-	ArtistNames      []byte
+	AlternateTitle   sql.NullString
+	AuthorName       sql.NullString
+	ArtistName       sql.NullString
 }
 
 func (q *Queries) GetMangaDetails(ctx context.Context) ([]GetMangaDetailsRow, error) {
@@ -60,10 +56,9 @@ func (q *Queries) GetMangaDetails(ctx context.Context) ([]GetMangaDetailsRow, er
 			&i.MangaTitle,
 			&i.OriginalLanguage,
 			&i.Status,
-			&i.Year,
-			&i.AlternateTitles,
-			&i.AuthorNames,
-			&i.ArtistNames,
+			&i.AlternateTitle,
+			&i.AuthorName,
+			&i.ArtistName,
 		); err != nil {
 			return nil, err
 		}
