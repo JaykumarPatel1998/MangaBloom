@@ -1,14 +1,15 @@
-package main
+package seeder
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 	"log"
-	"mangabloom/seed/internal/database"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/JaykumarPatel1998/MangaBloom/seeder/internal/database"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -16,13 +17,17 @@ import (
 
 var db *sql.DB
 
+type dbConfig struct {
+	DB *database.Queries
+}
+
 var mangadex_api_url string
 
 func sleep(duration time.Duration) {
 	time.Sleep(duration)
 }
 
-func init() {
+func initialize() {
 	godotenv.Load(".env")
 	db_url := os.Getenv("DB_URL")
 	if db_url == "" {
@@ -45,15 +50,19 @@ func init() {
 	db.SetMaxIdleConns(5)
 }
 
-func main() {
+func SeedDatabase() {
+	initialize()
 	var migration_table MigrationTable
 	fmt.Println("migration starts: ", time.Now())
 	MigrationStart(&migration_table)
 
 	//lets just try to query the data and add it to the database
 	client := &http.Client{}
+	db_cfg := dbConfig{
+		DB: database.New(db),
+	}
 
-	for page := 1; ; page++ {
+	for page := 0; ; page++ {
 		var mangaList []Manga
 		var titleList []Title
 		var tags []Tag
@@ -76,10 +85,63 @@ func main() {
 			break
 		}
 
-		var db_queries *database.Queries
-
+		//insert mangas
 		for _, manga := range mangaList {
-			err := db_queries.InsertManga(context.Background(), database.InsertMangaParams(manga))
+			err := db_cfg.DB.InsertManga(context.Background(), database.InsertMangaParams(manga))
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+		}
+
+		//insert titles
+		for _, title := range titleList {
+			err := db_cfg.DB.InsertTitle(context.Background(), database.InsertTitleParams(title))
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+		}
+
+		// insert descriptions
+		for _, description := range descriptions {
+			err := db_cfg.DB.InsertDescription(context.Background(), database.InsertDescriptionParams(description))
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+		}
+
+		// isnert authors
+		for _, author := range authors {
+			err := db_cfg.DB.InsertAuthor(context.Background(), database.InsertAuthorParams(author))
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+		}
+
+		// insert artists
+		for _, artist := range artists {
+			err := db_cfg.DB.InsertArtist(context.Background(), database.InsertArtistParams(artist))
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+		}
+
+		// insert manga_authors
+		for _, manga_author := range manga_authors {
+			err := db_cfg.DB.InsertMangaAuthor(context.Background(), database.InsertMangaAuthorParams(manga_author))
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+		}
+
+		// insert manga_artists
+		for _, manga_artist := range manga_artists {
+			err := db_cfg.DB.InsertMangaArtist(context.Background(), database.InsertMangaArtistParams(manga_artist))
 			if err != nil {
 				log.Fatal(err)
 				return
@@ -87,7 +149,7 @@ func main() {
 		}
 
 		//cleanup
-		sleep(200 * time.Millisecond) // Delay after each page fetch
+		sleep(2000 * time.Millisecond) // Delay after each page fetch
 	}
 
 	MigrationEnd(&migration_table)

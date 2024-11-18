@@ -1,4 +1,4 @@
-package main
+package seeder
 
 import (
 	"database/sql"
@@ -6,12 +6,15 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"mangabloom/seed/dto"
 	"net/http"
+
+	"github.com/JaykumarPatel1998/MangaBloom/seeder/dto"
 
 	"github.com/google/uuid"
 )
 
+// just bookmarking some code to start the docker container for dev - postgres
+// docker run -d --name postgres-v1 -p 5432:5432 -e POSTGRES_PASSWORD=password -e PGDATA=/var/lib/postgresql/data/pgdata postgres
 func uuidParser(str string) uuid.UUID {
 	res, err := uuid.Parse(str)
 	if err != nil {

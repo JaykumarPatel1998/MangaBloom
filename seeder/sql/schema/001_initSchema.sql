@@ -92,14 +92,14 @@ CREATE TABLE chapters (
 );
 
 -- +goose Down
-DROP TABLE manga;
 DROP TABLE titles;
 DROP TABLE descriptions;
-DROP TABLE authors;
 DROP TABLE manga_authors;
-DROP TABLE artists;
+DROP TABLE authors;
 DROP TABLE manga_artists;
+DROP TABLE artists;
 DROP TABLE cover_images;
-DROP TABLE tags;
 DROP TABLE manga_tags;
+DROP TABLE tags;
 DROP TABLE chapters;
+DROP TABLE manga;

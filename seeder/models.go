@@ -1,4 +1,4 @@
-package main
+package seeder
 
 import (
 	"database/sql"
@@ -40,7 +40,6 @@ type CoverImage struct {
 }
 
 type Description struct {
-	ID           int32          `json:"id"`
 	MangaID      uuid.NullUUID  `json:"manga_id"`
 	LanguageCode sql.NullString `json:"language_code"`
 	Description  sql.NullString `json:"description"`
@@ -89,7 +88,6 @@ type Tag struct {
 }
 
 type Title struct {
-	ID           int32          `json:"id"`
 	MangaID      uuid.NullUUID  `json:"manga_id"`
 	LanguageCode sql.NullString `json:"language_code"`
 	Title        sql.NullString `json:"title"`

@@ -1,4 +1,4 @@
-module mangabloom/seed
+module github.com/JaykumarPatel1998/MangaBloom/seeder
 
 go 1.23.3
 

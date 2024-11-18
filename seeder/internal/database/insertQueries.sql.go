@@ -16,7 +16,7 @@ const insertArtist = `-- name: InsertArtist :exec
 INSERT INTO artists(
     id, name
 )
-VALUES ($1, $2)
+VALUES ($1, $2) ON CONFLICT(id) DO NOTHING
 `
 
 type InsertArtistParams struct {
@@ -33,7 +33,7 @@ const insertAuthor = `-- name: InsertAuthor :exec
 INSERT INTO authors(
     id, name
 )
-VALUES ($1, $2)
+VALUES ($1, $2) ON CONFLICT(id) DO NOTHING
 `
 
 type InsertAuthorParams struct {
@@ -52,7 +52,7 @@ INSERT INTO chapters(
 )
 VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
-)
+) ON CONFLICT(id) DO NOTHING
 `
 
 type InsertChapterParams struct {
@@ -138,7 +138,7 @@ INSERT INTO manga(
 )
 VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
-)
+) ON CONFLICT(id) DO NOTHING
 `
 
 type InsertMangaParams struct {
