@@ -17,7 +17,7 @@ import (
 
 var db *sql.DB
 
-type dbConfig struct {
+type DBConfig struct {
 	DB *database.Queries
 }
 
@@ -58,7 +58,7 @@ func SeedDatabase() {
 
 	//lets just try to query the data and add it to the database
 	client := &http.Client{}
-	db_cfg := dbConfig{
+	db_cfg := DBConfig{
 		DB: database.New(db),
 	}
 
