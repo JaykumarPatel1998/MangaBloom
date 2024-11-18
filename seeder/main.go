@@ -21,6 +21,11 @@ type DBConfig struct {
 	DB *database.Queries
 }
 
+type MangaSeeder struct {
+	manga_seed   string
+	manga_number int32
+}
+
 var mangadex_api_url string
 
 func sleep(duration time.Duration) {
