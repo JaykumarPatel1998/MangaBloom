@@ -8,67 +8,51 @@ package database
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 
 	"github.com/google/uuid"
 )
 
-const getMangaDetails = `-- name: GetMangaDetails :many
+const getMangaDetailsById = `-- name: GetMangaDetailsById :one
 SELECT 
     m.id AS manga_id,
-    m.title AS manga_title,
+    JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('language_code', t.language_code, 'title', t.title)) AS manga_titles,
+    JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('language_code', d.language_code, 'description', d.description)) AS manga_descriptions,
     m.original_language,
     m.status,
-    t.title AS alternate_title,
-    a.name AS author_name,
-    ar.name AS artist_name
-FROM 
+    ARRAY_AGG(DISTINCT ma.author_id) AS authors,
+    ARRAY_AGG(DISTINCT mar.artist_id) AS artists
+FROM
     manga m
 LEFT JOIN titles t ON m.id = t.manga_id
+LEFT JOIN descriptions d ON m.id = d.manga_id
 LEFT JOIN manga_authors ma ON m.id = ma.manga_id
-LEFT JOIN authors a ON ma.author_id = a.id
 LEFT JOIN manga_artists mar ON m.id = mar.manga_id
-LEFT JOIN artists ar ON mar.artist_id = ar.id
-ORDER BY 
-    m.title, t.language_code, a.name, ar.name
+WHERE m.id = $1
+GROUP BY m.id
 `
 
-type GetMangaDetailsRow struct {
-	MangaID          uuid.UUID
-	MangaTitle       sql.NullString
-	OriginalLanguage sql.NullString
-	Status           sql.NullString
-	AlternateTitle   sql.NullString
-	AuthorName       sql.NullString
-	ArtistName       sql.NullString
+type GetMangaDetailsByIdRow struct {
+	MangaID           uuid.UUID
+	MangaTitles       json.RawMessage
+	MangaDescriptions json.RawMessage
+	OriginalLanguage  sql.NullString
+	Status            sql.NullString
+	Authors           interface{}
+	Artists           interface{}
 }
 
-func (q *Queries) GetMangaDetails(ctx context.Context) ([]GetMangaDetailsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getMangaDetails)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetMangaDetailsRow
-	for rows.Next() {
-		var i GetMangaDetailsRow
-		if err := rows.Scan(
-			&i.MangaID,
-			&i.MangaTitle,
-			&i.OriginalLanguage,
-			&i.Status,
-			&i.AlternateTitle,
-			&i.AuthorName,
-			&i.ArtistName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetMangaDetailsById(ctx context.Context, id uuid.UUID) (GetMangaDetailsByIdRow, error) {
+	row := q.db.QueryRowContext(ctx, getMangaDetailsById, id)
+	var i GetMangaDetailsByIdRow
+	err := row.Scan(
+		&i.MangaID,
+		&i.MangaTitles,
+		&i.MangaDescriptions,
+		&i.OriginalLanguage,
+		&i.Status,
+		&i.Authors,
+		&i.Artists,
+	)
+	return i, err
 }

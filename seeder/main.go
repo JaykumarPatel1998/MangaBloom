@@ -3,13 +3,17 @@ package seeder
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/JaykumarPatel1998/MangaBloom/seeder/database"
+	"github.com/JaykumarPatel1998/MangaBloom/seeder/dto"
+	"github.com/google/uuid"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -19,11 +23,6 @@ var db *sql.DB
 
 type DBConfig struct {
 	DB *database.Queries
-}
-
-type MangaSeeder struct {
-	manga_seed   string
-	manga_number int32
 }
 
 var mangadex_api_url string
@@ -76,7 +75,7 @@ func SeedDatabase() {
 		var manga_authors []MangaAuthor
 		var manga_artists []MangaArtist
 		var chapters []Chapter
-		var cover_images []CoverImage
+		var cover_images []string
 		var descriptions []Description
 
 		fmt.Println("fetching page number: ", page)
@@ -153,8 +152,51 @@ func SeedDatabase() {
 			}
 		}
 
+		for _, cover_image := range cover_images {
+			resp, err := client.Get(cover_image)
+			if err != nil {
+				return
+			}
+
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return
+			}
+			sleep(200 * time.Millisecond)
+
+			var apiResponse dto.CoverAPIResponse
+			if err := json.Unmarshal(body, &apiResponse); err != nil {
+				log.Fatal(err)
+				return
+			}
+
+			coverRes := apiResponse.Data
+			for _, rel := range coverRes.Relationships {
+				if rel.Type == "manga" {
+					cover := CoverImage{
+						ID: uuidParser(coverRes.ID),
+						MangaID: uuid.NullUUID{
+							UUID:  uuidParser(rel.ID),
+							Valid: true,
+						},
+						FilePath: fmt.Sprintf("https://uploads.mangadex.org/covers/%v/%v.256.jpg", rel.ID, coverRes.Attributes.FileName),
+						UploadedAt: sql.NullTime{
+							Time:  coverRes.Attributes.CreatedAt,
+							Valid: true,
+						},
+					}
+
+					err := db_cfg.DB.InsertCoverImage(context.Background(), database.InsertCoverImageParams(cover))
+					if err != nil {
+						log.Fatal(err)
+						return
+					}
+				}
+			}
+		}
+
 		//cleanup
-		sleep(2000 * time.Millisecond) // Delay after each page fetch
+		sleep(200 * time.Millisecond) // Delay after each page fetch
 	}
 
 	MigrationEnd(&migration_table)

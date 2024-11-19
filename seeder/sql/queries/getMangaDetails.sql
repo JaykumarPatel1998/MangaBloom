@@ -1,18 +1,17 @@
--- name: GetMangaDetails :many
+-- name: GetMangaDetailsById :one
 SELECT 
     m.id AS manga_id,
-    m.title AS manga_title,
+    JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('language_code', t.language_code, 'title', t.title)) AS manga_titles,
+    JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('language_code', d.language_code, 'description', d.description)) AS manga_descriptions,
     m.original_language,
     m.status,
-    t.title AS alternate_title,
-    a.name AS author_name,
-    ar.name AS artist_name
-FROM 
+    ARRAY_AGG(DISTINCT ma.author_id) AS authors,
+    ARRAY_AGG(DISTINCT mar.artist_id) AS artists
+FROM
     manga m
 LEFT JOIN titles t ON m.id = t.manga_id
+LEFT JOIN descriptions d ON m.id = d.manga_id
 LEFT JOIN manga_authors ma ON m.id = ma.manga_id
-LEFT JOIN authors a ON ma.author_id = a.id
 LEFT JOIN manga_artists mar ON m.id = mar.manga_id
-LEFT JOIN artists ar ON mar.artist_id = ar.id
-ORDER BY 
-    m.title, t.language_code, a.name, ar.name;
+WHERE m.id = $1
+GROUP BY m.id;

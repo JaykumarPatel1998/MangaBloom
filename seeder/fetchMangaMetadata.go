@@ -35,7 +35,7 @@ func keyExistsInMapThenReturnSQLNullString(entityMap *map[string]string, key str
 
 func FetchMangaListWithPagination(client *http.Client, mangalist *[]Manga, titleList *[]Title,
 	tags *[]Tag, authors *[]Author, artists *[]Artist, manga_authors *[]MangaAuthor,
-	manga_artists *[]MangaArtist, chapters *[]Chapter, cover_images *[]CoverImage,
+	manga_artists *[]MangaArtist, chapters *[]Chapter, cover_images *[]string,
 	descriptions *[]Description, page int) error {
 	url := fmt.Sprintf("%vmanga?limit=100&offset=%v&order[latestUploadedChapter]=desc", mangadex_api_url, page*100)
 	fmt.Println("fetching url : ", url)
@@ -88,6 +88,7 @@ func FetchMangaListWithPagination(client *http.Client, mangalist *[]Manga, title
 		populateArtists(mangaRes, artists)
 		populateMangaAuthors(mangaRes, manga_authors)
 		populateMangaArtists(mangaRes, manga_artists)
+		populateCoverArt(mangaRes, cover_images)
 		*mangalist = append(*mangalist, manga)
 	}
 	return nil
@@ -174,6 +175,16 @@ func populateMangaArtists(mangaResponse dto.MangaResponse, mangaArtistList *[]Ma
 				ArtistID: artistID,
 			}
 			*mangaArtistList = append(*mangaArtistList, mangaArtist)
+		}
+	}
+}
+
+func populateCoverArt(mangaResponse dto.MangaResponse, coverList *[]string) {
+	for _, cover := range mangaResponse.Relationships {
+		if cover.Type == "cover_art" {
+			coverID := uuidParser(cover.ID)
+			coverFetchUrl := fmt.Sprintf("https://api.mangadex.org/cover/%v", coverID)
+			*coverList = append(*coverList, coverFetchUrl)
 		}
 	}
 }
