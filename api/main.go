@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"os"
 
 	"github.com/JaykumarPatel1998/MangaBloom/seeder/database" // Replace with the actual path to your sqlc-generated package
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
@@ -12,7 +14,14 @@ import (
 
 // Database setup (replace with your own connection details)
 func setupDB() (*sql.DB, error) {
-	connStr := "postgres://postgres:password@localhost:5432/postgres?sslmode=disable"
+	err := godotenv.Load(".env")
+	if err != nil {
+		return nil, err
+	}
+
+	db_url := os.Getenv("DB_URL")
+
+	connStr := db_url
 	return sql.Open("postgres", connStr)
 }
 

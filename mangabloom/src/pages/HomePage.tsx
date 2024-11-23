@@ -21,7 +21,6 @@ export type Manga = {
 };
 
 export default function Homepage() {
-
   const {isPending, error, data, isFetching} = useQuery({
     queryKey : ['mangas'],
     queryFn : async () => {

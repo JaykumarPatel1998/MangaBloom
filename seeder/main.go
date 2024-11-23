@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -33,10 +34,14 @@ func sleep(duration time.Duration) {
 
 func initialize() {
 	godotenv.Load(".env")
-	db_url := os.Getenv("DB_URL")
-	if db_url == "" {
+	db_url_string := os.Getenv("DB_URL")
+
+	if db_url_string == "" {
 		log.Fatal("msising db_url")
 	}
+
+	db_url, _ := url.Parse(db_url_string)
+	db_url.RawQuery = "sslmode=verify-ca;sslrootcert=ca.pem"
 
 	mangadex_api_url = os.Getenv("MANGADEX_API_BASE_URL")
 	if mangadex_api_url == "" {
@@ -44,7 +49,7 @@ func initialize() {
 	}
 
 	var err error
-	db, err = sql.Open("postgres", db_url)
+	db, err = sql.Open("postgres", db_url.String())
 	if err != nil {
 		log.Fatalf("failed to connect to database : %v", err)
 	}
