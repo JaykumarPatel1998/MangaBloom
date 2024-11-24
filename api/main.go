@@ -51,10 +51,7 @@ func main() {
 
 	// cors middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{
-			"http://localhost:5173", // Adjust to match the URL of your React frontend
-			// You can add more origins if needed, e.g., "https://your-frontend.com"
-		},
+		AllowOrigins: []string{"*"}, // Allow all origins
 		AllowMethods: []string{
 			echo.GET,
 			echo.POST,

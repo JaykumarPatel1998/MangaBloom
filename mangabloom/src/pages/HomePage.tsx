@@ -25,7 +25,7 @@ export default function Homepage() {
     queryKey : ['mangas'],
     queryFn : async () => {
         // Make the API request
-        const res = await axios.get("http://localhost:3000/mangas");
+        const res = await axios.get("http://132.145.103.138/mangas");
 
         // Extract the manga data from the response
         const mangasRes = res.data["mangas"]; // Assuming the response is directly the array of mangasRes
