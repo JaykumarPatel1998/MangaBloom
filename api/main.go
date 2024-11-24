@@ -65,10 +65,10 @@ func main() {
 			echo.HeaderAccept,
 			echo.HeaderAuthorization, // Useful if you use tokens
 			"ngrok-skip-browser-warning",
-			"Access-Control-Allow-Headers", // Include this explicitly
+			"Access-Control-Allow-Origin", // Include this explicitly
 		},
 		ExposeHeaders: []string{
-			"Access-Control-Allow-Headers",
+			"Access-Control-Allow-Origin",
 		},
 	}))
 
