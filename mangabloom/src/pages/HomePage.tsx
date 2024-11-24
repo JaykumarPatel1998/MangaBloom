@@ -25,7 +25,7 @@ export default function Homepage() {
     queryKey : ['mangas'],
     queryFn : async () => {
         // Make the API request
-        const res = await axios.get("https://4eca-132-145-103-138.ngrok-free.app/mangas", {
+        const res = await axios.get("https://166f-132-145-103-138.ngrok-free.app/mangas", {
           headers: {
             'ngrok-skip-browser-warning': 'true'  // Custom header to skip the warning page
           }

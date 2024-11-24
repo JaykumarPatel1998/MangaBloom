@@ -2,20 +2,54 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
 interface MangaCardProps {
-  imageUrl: string
-  title: string
-  author: string
-  genres: string[]
-  latestChapter: string
+  imageUrl: string;
+  title: string;
+  author: string;
+  genres: string[];
+  latestChapter: string | null;
 }
 
 export default function MangaCardPrimary({ imageUrl, title, author, genres, latestChapter }: MangaCardProps) {
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!imageUrl || imageUrl === "") {
+      setImageSrc(null);  // If the imageUrl is empty, clear the imageSrc
+      return;
+    }
+
+    // Function to fetch image with custom headers using axios
+    const fetchImageWithHeaders = async (imageUrl: string) => {
+      try {
+        const response = await axios.get("https://166f-132-145-103-138.ngrok-free.app" + "/covers/" + imageUrl, {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',  // Custom header to skip ngrok browser warning
+          },
+          responseType: 'blob',  // Important: specify the response type as blob for image data
+        });
+
+        // Convert the response to a URL object
+        const imageObjectURL = URL.createObjectURL(response.data);
+        setImageSrc(imageObjectURL);  // Set the image source for rendering
+      } catch (error) {
+        console.error('Error fetching image:', error);
+        setImageSrc(null);  // Fallback in case of error
+      }
+    };
+
+    // Fetch the image when the component mounts or imageUrl changes
+    fetchImageWithHeaders(imageUrl);
+  }, [imageUrl]);
+
   return (
     <Card className="w-full max-w-xs mx-auto overflow-hidden group hover:shadow-xl transition-shadow duration-300 bg-background">
       <div className="relative w-full h-48 overflow-hidden">
         <img
-          src={imageUrl}
+          src={imageSrc? imageSrc : ""}  // Use the state image source
           alt={title}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -32,13 +66,12 @@ export default function MangaCardPrimary({ imageUrl, title, author, genres, late
           ))}
         </div>
       </CardContent>
-      { latestChapter &&
-        (<CardFooter className="px-4 py-3 bg-muted/50 flex justify-between items-center">
+      {latestChapter && (
+        <CardFooter className="px-4 py-3 bg-muted/50 flex justify-between items-center">
           <span className="text-sm font-medium">Ch. {latestChapter} (Latest)</span>
           <Button size="sm" variant="secondary">Read</Button>
-        </CardFooter>)
-      }
+        </CardFooter>
+      )}
     </Card>
-  )
+  );
 }
-
