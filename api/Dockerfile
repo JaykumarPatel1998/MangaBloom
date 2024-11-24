@@ -4,24 +4,26 @@ FROM golang:1.23-alpine
 WORKDIR /app
 
 # Download Go modules
-COPY go.mod go.sum ./
+COPY go.mod go.sum ./ 
 RUN go mod download
 
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/reference/dockerfile/#copy
-COPY *.go ./
+# Copy the source code and Dockerfile
+COPY *.go ./ 
+COPY Dockerfile ./ 
+COPY .env ./ 
+COPY ca.pem ./ 
 
-# Copy of Dockerfile
-COPY Dockerfile ./
-
-COPY .env ./
-
-COPY ca.pem ./
-
-# Build
+# Build the Go application
 RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
 
+# Create the covers directory in the container
+RUN mkdir -p /app/covers
+
+# Expose the port the app will run on
 EXPOSE 8080
 
-# Run
+# Define the volume for covers directory
+VOLUME /app/covers
+
+# Run the Go application
 CMD ["/docker-gs-ping"]

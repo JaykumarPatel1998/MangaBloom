@@ -72,6 +72,8 @@ func main() {
 		},
 	}))
 
+	e.Static("/covers", "./covers")
+
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"health": "OK",

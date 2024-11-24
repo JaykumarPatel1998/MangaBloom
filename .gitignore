@@ -6,3 +6,4 @@ seedDB/cover_images/*
 **/*.exe
 migration/
 **/*.pem
+**/covers/

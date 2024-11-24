@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"net/http"
+	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -65,13 +67,13 @@ func handleGetPaginatedMangas(c echo.Context, queries *database.Queries) error {
 
 	// Format the response
 	response := []map[string]interface{}{}
-	for _, manga := range mangas {
+	cover_image_urls := make(map[string]string)
 
+	for _, manga := range mangas {
 		// If Tags is a single string and you want to treat it as an array, split it (if needed)
 		var tags []string
 		switch v := manga.Tags.(type) {
 		case string:
-			// Assuming tags are stored as a single string with a delimiter (e.g., comma separated)
 			tags = strings.Split(v, ",") // Modify the delimiter if necessary
 		case []string:
 			tags = v // If it's already an array, use it directly
@@ -79,17 +81,39 @@ func handleGetPaginatedMangas(c echo.Context, queries *database.Queries) error {
 			tags = []string{} // Default to empty array if the type doesn't match
 		}
 
+		url := manga.CoverImage.String
+		image := extractImageName(url)
+
+		if image != "" {
+			cover_image_urls[image] = url
+
+			// Offload the image download to a goroutine (no wait)
+			go fetchAndSaveImage(url, filepath.Join("./covers", image))
+		}
+
+		// Format the manga data for response
 		response = append(response, map[string]interface{}{
 			"id":             manga.MangaID,
 			"title":          manga.Title.String,
-			"cover_image":    manga.CoverImage.String,
+			"cover_image":    image,
 			"latest_chapter": manga.LatestChapter.String, // Adjust the type if needed
 			"tags":           tags,                       // Adjust the type if needed
 		})
 	}
 
-	// Return the response
+	// Return the response immediately without waiting for images
 	return c.JSON(http.StatusOK, echo.Map{
 		"mangas": response,
 	})
+}
+
+func extractImageName(url string) string {
+	// Regular expression to capture the image name including the `.256.jpg` part
+	re := regexp.MustCompile(`/covers/[^/]+/([^/]+\.256\.jpg)$`)
+	match := re.FindStringSubmatch(url)
+
+	if len(match) > 1 {
+		return match[1] // The image name including `.256.jpg`
+	}
+	return ""
 }
