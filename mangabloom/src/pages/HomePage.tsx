@@ -25,10 +25,18 @@ export default function Homepage() {
     queryKey : ['mangas'],
     queryFn : async () => {
         // Make the API request
-        const res = await axios.get("http://132.145.103.138/mangas");
+        const res = await axios.get("https://07cf-132-145-103-138.ngrok-free.app/mangas", {
+          headers: {
+            'ngrok-skip-browser-warning': 'true'  // Custom header to skip the warning page
+          }
+        });
+
 
         // Extract the manga data from the response
         const mangasRes = res.data["mangas"]; // Assuming the response is directly the array of mangasRes
+
+        console.log(res.data)
+        // console.log(mangasRes)
 
         return [
             ...mangasRes.map(

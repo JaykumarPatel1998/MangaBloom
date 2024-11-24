@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 
@@ -62,8 +63,20 @@ func main() {
 		AllowHeaders: []string{
 			echo.HeaderContentType,
 			echo.HeaderAccept,
+			echo.HeaderAuthorization, // Useful if you use tokens
+			"ngrok-skip-browser-warning",
+			"Access-Control-Allow-Headers", // Include this explicitly
+		},
+		ExposeHeaders: []string{
+			"Access-Control-Allow-Headers",
 		},
 	}))
+
+	e.GET("/", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{
+			"health": "OK",
+		})
+	})
 
 	// Define routes
 	e.GET("/mangas", func(c echo.Context) error {
