@@ -2,11 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
+	"net/url"
 	"os"
 
 	"github.com/JaykumarPatel1998/MangaBloom/seeder/database" // Replace with the actual path to your sqlc-generated package
-
 	"github.com/joho/godotenv"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
@@ -19,10 +21,15 @@ func setupDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	db_url := os.Getenv("DB_URL")
+	db_url_string := os.Getenv("DB_URL")
+	if db_url_string == "" {
+		return nil, fmt.Errorf("db_url not found")
+	}
 
-	connStr := db_url
-	return sql.Open("postgres", connStr)
+	db_url, _ := url.Parse(db_url_string)
+	db_url.RawQuery = "sslmode=verify-ca;sslrootcert=ca.pem"
+
+	return sql.Open("postgres", db_url.String())
 }
 
 func main() {

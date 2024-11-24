@@ -5,3 +5,4 @@ seedDB/cover_images/*
 **/node_modules/
 **/*.exe
 migration/
+**/*.pem
