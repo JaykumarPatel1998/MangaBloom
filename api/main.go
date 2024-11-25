@@ -52,7 +52,7 @@ func main() {
 
 	// cors middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"}, // Allow all origins
+		AllowOrigins: []string{"https://manga-bloom.vercel.app", "http://localhost:5173"}, // Allow all origins
 		AllowMethods: []string{
 			echo.GET,
 			echo.POST,
@@ -67,12 +67,18 @@ func main() {
 			"ngrok-skip-browser-warning",
 			"Access-Control-Allow-Origin", // Include this explicitly
 		},
-		ExposeHeaders: []string{
-			"Access-Control-Allow-Origin",
-		},
 	}))
 
-	e.Static("/covers", "./covers")
+	e.GET("/covers/*", func(c echo.Context) error {
+		file := c.Param("*")
+		filePath := "./covers/" + file
+
+		// Set headers
+		c.Response().Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+
+		// Serve the file
+		return c.File(filePath)
+	})
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{

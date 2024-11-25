@@ -22,7 +22,7 @@ export type Manga = {
 
 export default function Homepage() {
   const {isPending, error, data, isFetching} = useQuery({
-    queryKey : ['mangas'],
+    queryKey : ['mangalist'],
     queryFn : async () => {
         // Make the API request
         const res = await axios.get("https://166f-132-145-103-138.ngrok-free.app/mangas", {
@@ -30,7 +30,6 @@ export default function Homepage() {
             'ngrok-skip-browser-warning': 'true'  // Custom header to skip the warning page
           }
         });
-
 
         // Extract the manga data from the response
         const mangasRes = res.data["mangas"]; // Assuming the response is directly the array of mangasRes

@@ -16,8 +16,25 @@ import {
 import { BrowserRouter } from "react-router";
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools"
 import Homepage from "@/pages/HomePage";
+import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { indexedDBPersister } from "./lib/indexedDbPersister";
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 60 * 24,
+      retry: false, // Do not retry when offline
+      refetchOnReconnect: false, // Prevent unnecessary network calls when reconnected
+      refetchOnWindowFocus: false, // Avoid refetching when focusing the browser window
+    },
+  },
+});
+
+// persist the query client
+persistQueryClient({
+  queryClient : queryClient,
+  persister: indexedDBPersister
+})
 
 function App() {
   return (
@@ -52,12 +69,11 @@ function App() {
 
 
         <QueryClientProvider client={queryClient}>
-          <ReactQueryDevtools/>
+          <ReactQueryDevtools initialIsOpen={false}/>
           <BrowserRouter>
             <Homepage/>
           </BrowserRouter>
         </QueryClientProvider>
-        
         
       </div>
     </SidebarProvider>
