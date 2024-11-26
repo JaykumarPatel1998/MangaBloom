@@ -2,10 +2,10 @@ import { z } from "zod";
 
 const MangaSchema = z.object({
     id : z.string(),
-    imageUrl: z.string(),
+    cover_image: z.string().optional(),
     title: z.string(),
-    genres: z.array(z.string()),
-    latestChapter: z.string(),
+    tags: z.array(z.string()).optional(),
+    latest_chapter: z.string().optional(),
 });
 
 export type Manga = z.infer<typeof MangaSchema>

@@ -12,6 +12,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import CommandCustomFiltering from "@/components/command-custom-filtering";
 import { useState } from "react";
+import { validateMangaArray } from "@/lib/mangaSchema";
 
 export default function Homepage() {
   const [offset, setOffset] = useState<number>(0);
@@ -30,27 +31,9 @@ export default function Homepage() {
             'ngrok-skip-browser-warning': 'true'  // Custom header to skip the warning page
           }
         });
-
-        // Extract the manga data from the response
-        const mangasRes = res.data["mangas"]; // Assuming the response is directly the array of mangasRes
-
-        return [
-            ...mangasRes.map(
-              (manga: {
-                cover_image: string;
-                title: string;
-                latest_chapter: string;
-                tags: string[];
-                id: string;
-              }) => ({
-                id: manga.id,
-                imageUrl: manga.cover_image,
-                title: manga.title, // Assuming you'd want to store title as well
-                latestChapter: parseInt(manga.latest_chapter) || null,
-                genres: manga.tags,
-              })
-            ),
-          ]
+        
+        const validResponse = validateMangaArray(res)
+        return validResponse
       },
   })
 
@@ -69,14 +52,15 @@ export default function Homepage() {
       {/*main content goes here */}
       <main>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {data.map((item: Manga) => (
+          {data.map((item) => (
             <MangaCardPrimary
               key={item.id}
-              imageUrl={item.imageUrl}
-              title={item.title}
-              author={item.author}
-              genres={item.genres}
-              latestChapter={item.latestChapter}
+              // imageUrl={item.imageUrl}
+              // title={item.title}
+              // author={item.author}
+              // genres={item.genres}
+              // latestChapter={item.latestChapter}
+              data={item}
             />
           ))}
         </div>

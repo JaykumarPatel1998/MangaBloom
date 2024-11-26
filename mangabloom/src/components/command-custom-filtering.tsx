@@ -10,17 +10,10 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { cn } from "@/lib/utils";
-
-type Mangas = {
-    cover_image: string;
-    title: string;
-    latest_chapter: string;
-    tags: string[];
-    id: string;
-  }
+import { Manga, validateMangaArray } from "@/lib/mangaSchema";
 
 // Function to fetch data using Axios
-const fetchResults = async (title: string): Promise<Mangas[]> => {
+const fetchResults = async (title: string): Promise<Manga[]> => {
   if (!title.trim()) return [];
   const res = await axios.get(
     "https://166f-132-145-103-138.ngrok-free.app/mangas",
@@ -33,27 +26,7 @@ const fetchResults = async (title: string): Promise<Mangas[]> => {
         }
     } // Pass 'title' as the query parameter
   );
-  
-  // Extract the manga data from the response
-  const mangasRes = res.data["mangas"]; // Assuming the response is directly the array of mangasRes
-
-  return [
-      ...mangasRes.map(
-        (manga: {
-          cover_image: string;
-          title: string;
-          latest_chapter: string;
-          tags: string[];
-          id: string;
-        }) => ({
-          id: manga.id,
-          imageUrl: manga.cover_image,
-          title: manga.title, // Assuming you'd want to store title as well
-          latestChapter: parseInt(manga.latest_chapter) || null,
-          genres: manga.tags,
-        })
-      ),
-    ]
+  return validateMangaArray(res)
 };
 
 export default function CommandWithReactQuery({className}:  {className : string}) {
