@@ -71,7 +71,7 @@ const themes = [
 export function AppSidebar() {
     return (
         <Sidebar>
-            <SidebarHeader className="text-lg mx-auto font-bold bg-background">Manga Bloom</SidebarHeader>
+            <SidebarHeader className="text-lg mx-auto font-bold bg-background">Manga Bloom <span className="text-muted-foreground bg-[hsl(var(--primary)/0.1)] p-2 rounded-sm text-center">Ctrl+B</span></SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel className="text-foreground text-lg bg-[hsl(var(--primary)/0.3)] w-max my-4">#Pick Your Poison</SidebarGroupLabel>
