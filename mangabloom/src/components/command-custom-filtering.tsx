@@ -16,7 +16,7 @@ import { Manga, validateMangaArray } from "@/lib/mangaSchema";
 const fetchResults = async (title: string): Promise<Manga[]> => {
   if (!title.trim()) return [];
   const res = await axios.get(
-    "https://166f-132-145-103-138.ngrok-free.app/mangas",
+    "https://0804-132-145-103-138.ngrok-free.app/mangas",
     { 
         params: {
             title : title
@@ -42,7 +42,7 @@ export default function CommandWithReactQuery({className}:  {className : string}
   return (
     <Command shouldFilter={false} className={cn(className)}>
       <CommandInput
-        placeholder="Search by title..."
+        placeholder="Black Sheep"
         value={commandInput}
         onValueChange={setCommandInput}
       />
