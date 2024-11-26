@@ -11,7 +11,7 @@ ___  ___                       ______ _
                      __/ |                                    
                     |___/                                     
 ```
-Work In Progress - https://vercel.com/jaykumarpatel1998s-projects/manga-bloom
+Work In Progress - https://manga-bloom.vercel.app/
 
 ## Disclaimer
 please note that this is not refined documentation, but dev logs and notes about my experience with this project.
