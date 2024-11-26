@@ -2,11 +2,8 @@ import { AppSidebar } from "./components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
 } from "./components/ui/navigation-menu";
 
 import {
@@ -48,21 +45,6 @@ function App() {
           <NavigationMenuList>
             <NavigationMenuItem>
               <SidebarTrigger />
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuLink href="#">| Link 1</NavigationMenuLink>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuLink href="#">| Link 2 |</NavigationMenuLink>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Item One</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <NavigationMenuLink>Link</NavigationMenuLink>
-              </NavigationMenuContent>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
