@@ -44,7 +44,7 @@ export default function Homepage() {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-2 relative">
-        <h1 className="text-3xl font-bold justify-self-center align-middle">Manga Bloom マンガブルーム</h1>
+        <img src="manga-bloom.webp" alt="manga bloom logo" className="w-[300px]"/>
         {/* search results goes here */}
         <CommandCustomFiltering className="rounded-lg border shadow-md"/>
       </div>
@@ -55,11 +55,6 @@ export default function Homepage() {
           {data.map((item) => (
             <MangaCardPrimary
               key={item.id}
-              // imageUrl={item.imageUrl}
-              // title={item.title}
-              // author={item.author}
-              // genres={item.genres}
-              // latestChapter={item.latestChapter}
               data={item}
             />
           ))}

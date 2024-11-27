@@ -41,11 +41,11 @@ export default function MangaCardPrimary({ data }: {data : Manga}) {
 
   return (
     <Card className="w-full max-w-xs mx-auto overflow-hidden group hover:shadow-xl transition-shadow duration-300 bg-background">
-      <div className="relative w-full h-48 overflow-hidden">
+      <div className="w-full">
         <img
           src={imageSrc? imageSrc : ""}  // Use the state image source
           alt={data.title}
-          className="object-cover transition-transform duration-300 group-hover:scale-110"
+          className="w-full transition-transform duration-300 hover:scale-110"
         />
       </div>
       <CardContent className="p-4">

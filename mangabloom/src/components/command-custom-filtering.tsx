@@ -40,9 +40,9 @@ export default function CommandWithReactQuery({className}:  {className : string}
   });
 
   return (
-    <Command shouldFilter={false} className={cn(className)}>
+    <Command shouldFilter={false} className={cn(className, "bg-[rgba(78, 33, 22, 0.3)]")}>
       <CommandInput
-        placeholder="Black Sheep"
+        placeholder="Blue Box"
         value={commandInput}
         onValueChange={setCommandInput}
       />
