@@ -7,7 +7,13 @@ SELECT
     m.status,
     ARRAY_AGG(DISTINCT ma.author_id) AS authors,
     ARRAY_AGG(DISTINCT mar.artist_id) AS artists,
-    JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('volume', c.volume, 'chapter', c.chapter, 'title', c.title)) AS chapters,
+    JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT(
+        'chapter_id', c.id, 
+        'volume', c.volume, 
+        'chapter', c.chapter, 
+        'title', c.title, 
+        'translated_language', c.translated_language
+    )) AS chapters,
     JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('id', ci.id, 'file_path', ci.file_path)) AS cover_images
 FROM
     manga m
