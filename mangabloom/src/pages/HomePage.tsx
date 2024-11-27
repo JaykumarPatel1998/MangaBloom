@@ -70,7 +70,10 @@ export default function Homepage() {
       <Pagination className="cursor-pointer">
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious onClick={()=>{setOffset(offset-1)}}  />
+            <PaginationPrevious onClick={()=>{
+              if (offset-1 < 0) return;
+              setOffset(offset-1)
+              }}  />
           </PaginationItem>
           <PaginationItem>
             <PaginationLink href="#">{offset+1}</PaginationLink>
