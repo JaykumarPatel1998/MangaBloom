@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/JaykumarPatel1998/MangaBloom/seeder/dto"
 
@@ -89,6 +90,7 @@ func FetchMangaListWithPagination(client *http.Client, mangalist *[]Manga, title
 		populateMangaAuthors(mangaRes, manga_authors)
 		populateMangaArtists(mangaRes, manga_artists)
 		populateCoverArt(mangaRes, cover_images)
+		populateChapters(client, mangaRes, chapters)
 		*mangalist = append(*mangalist, manga)
 	}
 	return nil
@@ -186,5 +188,20 @@ func populateCoverArt(mangaResponse dto.MangaResponse, coverList *[]string) {
 			coverFetchUrl := fmt.Sprintf("https://api.mangadex.org/cover/%v", coverID)
 			*coverList = append(*coverList, coverFetchUrl)
 		}
+	}
+}
+
+func populateChapters(client *http.Client, mangaReponse dto.MangaResponse, chapters *[]Chapter) {
+	for chap_page := 0; ; chap_page++ {
+		fmt.Println("fetching chap_page number: ", chap_page)
+		err := FetchChapters(client, mangaReponse.ID, chapters, chap_page)
+		if err != nil {
+			fmt.Println("Error fetching manga list:", err)
+			return
+		}
+		if len(*chapters) <= 0 {
+			break
+		}
+		sleep(200 * time.Millisecond)
 	}
 }

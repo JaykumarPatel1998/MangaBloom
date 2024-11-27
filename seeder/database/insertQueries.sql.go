@@ -95,6 +95,7 @@ INSERT INTO cover_images(
     id, manga_id, file_path, uploaded_at
 )
 VALUES ($1, $2, $3, $4)
+ON CONFLICT (id) DO NOTHING
 `
 
 type InsertCoverImageParams struct {
@@ -118,7 +119,7 @@ const insertDescription = `-- name: InsertDescription :exec
 INSERT INTO descriptions(
     manga_id, language_code, description
 )
-VALUES ($1, $2, $3)
+VALUES ($1, $2, $3) ON CONFLICT(id) DO NOTHING
 `
 
 type InsertDescriptionParams struct {
@@ -183,10 +184,11 @@ func (q *Queries) InsertManga(ctx context.Context, arg InsertMangaParams) error 
 }
 
 const insertMangaArtist = `-- name: InsertMangaArtist :exec
-INSERT INTO manga_artists(
+INSERT INTO manga_artists (
     manga_id, artist_id
 )
-VALUES ($1, $2)
+VALUES ($1, $2) 
+ON CONFLICT (manga_id, artist_id) DO NOTHING
 `
 
 type InsertMangaArtistParams struct {
@@ -203,7 +205,7 @@ const insertMangaAuthor = `-- name: InsertMangaAuthor :exec
 INSERT INTO manga_authors(
     manga_id, author_id
 )
-VALUES ($1, $2)
+VALUES ($1, $2) ON CONFLICT(manga_id, author_id) DO NOTHING
 `
 
 type InsertMangaAuthorParams struct {
@@ -221,6 +223,7 @@ INSERT INTO manga_tags(
     manga_id, tag_id
 )
 VALUES ($1, $2)
+ON CONFLICT (manga_id, tag_id) DO NOTHING
 `
 
 type InsertMangaTagParams struct {
@@ -238,6 +241,7 @@ INSERT INTO tags(
     id, name, description, group_name, version
 )
 VALUES ($1, $2, $3, $4, $5)
+ON CONFLICT (id) DO NOTHING
 `
 
 type InsertTagParams struct {
@@ -263,7 +267,7 @@ const insertTitle = `-- name: InsertTitle :exec
 INSERT INTO titles(
     manga_id, language_code, title
 )
-VALUES ($1, $2, $3)
+VALUES ($1, $2, $3) ON CONFLICT(id) DO NOTHING
 `
 
 type InsertTitleParams struct {
