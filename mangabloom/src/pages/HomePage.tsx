@@ -22,7 +22,7 @@ export default function Homepage() {
     queryKey: ["mangalist", offset],
     queryFn : async () => {
         // Make the API request
-        const res = await axios.get("https://0804-132-145-103-138.ngrok-free.app/mangas", {
+        const res = await axios.get("https://47c9-132-145-103-138.ngrok-free.app/mangas", {
           params : {
             offset : offset * limit,
             limit : limit

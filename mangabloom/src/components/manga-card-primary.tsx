@@ -19,7 +19,7 @@ export default function MangaCardPrimary({ data }: {data : Manga}) {
     // Function to fetch image with custom headers using axios
     const fetchImageWithHeaders = async (cover_image: string) => {
       try {
-        const response = await axios.get("https://0804-132-145-103-138.ngrok-free.app" + "/covers/" + cover_image, {
+        const response = await axios.get("https://47c9-132-145-103-138.ngrok-free.app" + "/covers/" + cover_image, {
           headers: {
             'ngrok-skip-browser-warning': 'true',  // Custom header to skip ngrok browser warning
           },

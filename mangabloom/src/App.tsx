@@ -15,6 +15,7 @@ import {ReactQueryDevtools} from "@tanstack/react-query-devtools"
 import Homepage from "@/pages/HomePage";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { indexedDBPersister } from "./lib/indexedDbPersister";
+import { Analytics } from "@vercel/analytics/react"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,7 @@ function App() {
     <SidebarProvider
       defaultOpen={true}
     >
+      <Analytics/>
       <AppSidebar />
 
       <div className="container">

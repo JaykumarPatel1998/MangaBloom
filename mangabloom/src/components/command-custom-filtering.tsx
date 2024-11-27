@@ -16,7 +16,7 @@ import { Manga, validateMangaArray } from "@/lib/mangaSchema";
 const fetchResults = async (title: string): Promise<Manga[]> => {
   if (!title.trim()) return [];
   const res = await axios.get(
-    "https://0804-132-145-103-138.ngrok-free.app/mangas",
+    "https://47c9-132-145-103-138.ngrok-free.app/mangas",
     { 
         params: {
             title : title
