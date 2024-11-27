@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -39,8 +40,8 @@ func initialize() {
 		log.Fatal("msising db_url")
 	}
 
-	// db_url, _ := url.Parse(db_url_string)
-	// db_url.RawQuery = "sslmode=verify-ca;sslrootcert=ca.pem"
+	db_url, _ := url.Parse(db_url_string)
+	db_url.RawQuery = "sslmode=verify-ca;sslrootcert=ca.pem"
 
 	mangadex_api_url = os.Getenv("MANGADEX_API_BASE_URL")
 	if mangadex_api_url == "" {
@@ -48,7 +49,7 @@ func initialize() {
 	}
 
 	var err error
-	db, err = sql.Open("postgres", db_url_string)
+	db, err = sql.Open("postgres", db_url.String())
 	if err != nil {
 		log.Fatalf("failed to connect to database : %v", err)
 	}

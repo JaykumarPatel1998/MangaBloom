@@ -116,13 +116,13 @@ func PopulateChapters(client *http.Client, mangaID string, chapters *[]Chapter) 
 
 	for i := 0; i < iterations; i++ {
 
+		sleep(200 * time.Millisecond)
+
 		// Fetch chapters and get the total count
 		err := FetchChapters(client, mangaID, chapters, i)
 		if err != nil {
 			fmt.Println("Error fetching manga list:", err)
 			return
 		}
-
-		sleep(200 * time.Millisecond)
 	}
 }
