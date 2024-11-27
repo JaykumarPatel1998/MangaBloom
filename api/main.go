@@ -92,9 +92,12 @@ func main() {
 		})
 	})
 
-	// Define routes
 	e.GET("/mangas", func(c echo.Context) error {
 		return handleGetPaginatedMangas(c, queries)
+	})
+
+	e.GET("/manga/:id", func(c echo.Context) error {
+		return handleGetMangaByID(c, queries)
 	})
 
 	// Start the server

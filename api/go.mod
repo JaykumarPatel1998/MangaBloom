@@ -3,7 +3,7 @@ module github.com/JaykumarPatel1998/MangaBloom/api
 go 1.23.3
 
 require (
-	github.com/JaykumarPatel1998/MangaBloom/seeder v0.0.0-20241127055837-b52ebfa09f89
+	github.com/JaykumarPatel1998/MangaBloom/seeder v0.0.0-20241127092123-66535e478a65
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.12.0
