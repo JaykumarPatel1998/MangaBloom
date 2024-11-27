@@ -11,17 +11,18 @@ ___  ___                       ______ _
                      __/ |                                    
                     |___/                                     
 ```
+Work In Progress - https://manga-bloom.vercel.app/
 
 ## Disclaimer
-please note that this is not a refined documentation you will find on every refined github public repo, but these are just my dev logs and notes about my experience with this project
+please note that this is not refined documentation, but dev logs and notes about my experience with this project.
 
-Hey readers, MangaBloom is a manga-binging application for manga/comic **(Japanese Translation: まんが)** fans like myself.  Let’s be real here for a moment,  all of us have tried to read manga on those shady manga websites - yes, the ones where you watch ads more than you read manga. I have grown tired of those and I suspect so have most of you. I bring to you Manga Bloom - It is an ad-free manga-binging application that is built around an open-source Manga API - [MangaDex](https://api.mangadex.org/docs/) and here is how I built it.
+Hey readers, MangaBloom is a manga-binging application for manga/comic **(Japanese Translation: まんが)** fans like myself.  Let’s be real here for a moment,  all of us have tried to read manga on those shady manga websites - yes, the ones where you watch ads more than you read manga. I have grown tired of those and I suspect so have most of you. I bring you Manga Bloom - It is an ad-free manga-binging application that is built around an open-source Manga API - [MangaDex](https://api.mangadex.org/docs/) and here is how I built it.
 
 There are some constraints we have to address to be a good citizen of the open-source world and respect MangaDex’s terms of usage
 
 1. Credit them - Huge thanks to MangaDex and Scanlation groups for their contribution - us otakus are grateful.
 2. No Ads/Paid Service allowed - we have to figure out some kind of money making model to keep the app running - Donations maybe? or maybe we will sell printed Naruto T-shirts, who knows?
-3. API rate limit - A strict API rate limit of 5 Requests/sec for all of their APIs - the ones that are serving manga metadata (title, description, chapters, cover pages, artists, authors, tags) and the ones serving digital pages for a given manga. Many of you would question - why not look for a different API that has elevated rate limits. Well, there aren’t any, and web scraping for manga is illegal !!
+3. API rate limit - A strict API rate limit of 5 Requests/sec for all of their APIs - the ones that are serving manga metadata (title, description, chapters, cover pages, artists, authors, tags) and the ones serving digital pages for a given manga. Many of you would question - why not look for a different API that has elevated rate limits? Well, there aren’t any, and web scraping for manga is illegal !!
 4. Proxy Requests - MangaDex would not accept any cross-origin requests from our browser client and our server has to proxy client requests to their server. If you are not the brightest apple in the bunch like me, here’s an example of what I just said- If a browser client requests a manga page from our server, we cannot simply provide them MangaDex’s image URL, we would have to download the image on our server and serve the client with the image. 
 
 ![https://media.tenor.com/iRkL6OMGhU4AAAAM/alarm.gif](https://media.tenor.com/iRkL6OMGhU4AAAAM/alarm.gif)
@@ -30,10 +31,10 @@ Now that we have got constraints out of the way, let's take some technical decis
 
 1. Language - My Programming language of choice is NodeJS because it is asynchronous, non-main-thread-blocking, event-driven, designed to build scalable network applications, yada, yada, yada - you know how it goes 😅.
 
-**Edit 1** : Now that I have started experimenting and running some concurrency tests, Node JS is not working as good as I expected. I ran some concurrency tests using apache benchmark (ab) and CPU/memory profiling on a NodeJS API (my use case - some Database querying, error handling and some list traversal and manipulation), and guess what? it was very easy for node api to memory leak, it just consumes too much memory!!. I also tried utilizing all cores of my CPU by using PM2 clustering, but still it was no good. I figure vertical/horizontal scaling would address this issue, but I am working with limited $$$. I will be running some tests with Java (😭) or Go maybe?
+**Edit 1**: Now that I have started experimenting and running some concurrency tests, Node JS is not working as good as I expected. I ran some concurrency tests using Apache benchmark (ab) and CPU/memory profiling on a NodeJS API (my use case - some database querying, error handling, and some list traversal and manipulation), and guess what? it was very easy for node API to memory leak, it just consumes too much memory!!. I also tried utilizing all cores of my CPU by using PM2 clustering, but still it was no good. I figure vertical/horizontal scaling would address this issue, but I am working with limited $$$. I will be running some tests with Java (😭) or Go maybe?
 
 ```plaintext
-Here are the results for Node Concurrency Test:(with clustering enabled PM2)
+Here are the results for the Node Concurrency Test:(with clustering enabled PM2)
 
 Concurrency Level:      10000, 1 req each connection
 Time taken for tests:   24.770 seconds
@@ -54,7 +55,7 @@ Waiting:        5 11846 6856.7  11414   23641
 Total:       1401 12626 6676.4  12231   24001
 ```
 
-**Edit 2** : I did same tests for Go API (Error handling is so much better)
+**Edit 2**: I did the same tests for Go API (Error handling is so much better)
 
 ```plaintext
 Concurrency Level:      10000
@@ -100,7 +101,7 @@ Total:        232 4651 2916.2   4100   32240
 2. Database - Now technically, we could work without an actual database since our data is managed by MangaDex but that rate limit of 5 req/sec hurts a bit and is a bottleneck we have to address before we design our app. There are many solutions to this problem, one I could come up with is as follows:
     1. The first step is to identify the data that is going to be accessed the most. As a manga-binging veteran, I suspect it is going to be the metadata about the manga than the actual manga pages.
     2. The second step is that we need to seed our local database with manga metadata. This should relieve us significantly from the API rate limit.  Unfortunately, this means we have to manage the data ourselves and keep taking periodic updates from the MangaDex API but, given our circumstances, I am willing to take my chances.
-    3. The third step is choosing what type of database - relational or NoSQL? I think the data we are dealing with is mostly relational. Seeding the database is also a complex process in our case because it's not just a single API call to the MangaDex API to get all the required data but, it is an orchestrated sequence of API requests, and the inserts that are made need to be atomic (transactional). And somewhere down the line, we would have to think about the versioning strategy to periodically update the data and look for newly released chapters and so on - relational databases handle that pretty well. Also, the number of mangas is not that much - around 80000. How do I know? I have read them all. JK, look at the API response - total count
+    3. The third step is choosing what type of database - relational or NoSQL? I think the data we are dealing with is mostly relational. Seeding the database is also a complex process in our case because it's not just a single API call to the MangaDex API to get all the required data but, it is an orchestrated sequence of API requests, and the inserts that are made need to be atomic (transactional). And somewhere down the line, we would have to think about the versioning strategy to periodically update the data and look for newly released chapters and so on - relational databases handle that pretty well. Also, the number of mangas is not that high - around 80000. How do I know? I have read them all. JK, look at the API response - total count
         
         ![image.png](markdown/image.png)
         
@@ -143,8 +144,8 @@ A big thank you to the open-source community for their continued contributions t
 
 ## Dev Logs
 [15-11-2024]
-I don't think its a good idea to store the chapter urls inside the database as chapter urls are msotly CDN delivered and are guaranteed to stay same for atleast 15 minutes -> really transient data to be updated every 15 minutes
+I don't think it's a good idea to store the chapter URLs inside the database as chapter URLs are mainly CDN delivered and are guaranteed to stay the same for at least 15 minutes -> transient data to be updated every 15 minutes
 
-I am learning these new things about database migration, came across these really good libraries 
-1. sqlc - sqlc compiles sql schema and queries to type safe Go Code, essentially to structs and functions
+I am learning new things about database migration, and came across these really good libraries 
+1. SQLC - sqlc compiles SQL schema and queries to type-safe Go Code, essentially to structs and functions
 2. goose - handles migrations in the sequence we label our migration files (DDL goes here)
