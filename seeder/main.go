@@ -60,6 +60,7 @@ func initialize() {
 
 func SeedDatabase() {
 	initialize()
+
 	var migration_table MigrationTable
 	fmt.Println("migration starts: ", time.Now())
 	MigrationStart(&migration_table)
@@ -70,7 +71,38 @@ func SeedDatabase() {
 		DB: database.New(db),
 	}
 
-	for page := 0; ; page++ {
+	url := fmt.Sprintf("%vmanga?limit=1&order[latestUploadedChapter]=desc", mangadex_api_url)
+	resp, err := client.Get(url)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Fatalf("non-OK HTTP status: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var apiResponse dto.APIResponse
+	if err := json.Unmarshal(body, &apiResponse); err != nil {
+		log.Fatal(err)
+	}
+
+	//we have count of total mangas
+	total_mangas := apiResponse.Total
+
+	fmt.Printf("	Total mangas to fetch : %v\n", total_mangas)
+
+	//considering 100 chapters in each iteration
+	iterations := (total_mangas + 99) / 100
+	fmt.Printf("	Total iterations : %v\n", iterations)
+
+	for page := 0; page < iterations; page++ {
 		var mangaList []Manga
 		var titleList []Title
 		var tags []Tag
@@ -78,19 +110,14 @@ func SeedDatabase() {
 		var artists []Artist
 		var manga_authors []MangaAuthor
 		var manga_artists []MangaArtist
-		var chapters []Chapter
 		var cover_images []string
 		var descriptions []Description
 
-		fmt.Println("fetching page number: ", page)
-		err := FetchMangaListWithPagination(client, &mangaList, &titleList, &tags, &authors, &artists, &manga_authors, &manga_artists, &chapters, &cover_images, &descriptions, page)
+		fmt.Println("fetching manga page number: ", page)
+		err := FetchMangaListWithPagination(client, &mangaList, &titleList, &tags, &authors, &artists, &manga_authors, &manga_artists, &cover_images, &descriptions, page)
 		if err != nil {
 			fmt.Println("Error fetching manga list:", err)
 			return
-		}
-
-		if len(mangaList) <= 0 {
-			break
 		}
 
 		//insert mangas
@@ -99,6 +126,17 @@ func SeedDatabase() {
 			if err != nil {
 				log.Fatal(err)
 				return
+			}
+
+			var chapter_list []Chapter
+
+			PopulateChapters(client, manga.ID.String(), &chapter_list)
+			for _, chapter := range chapter_list {
+				err := db_cfg.DB.InsertChapter(context.Background(), database.InsertChapterParams(chapter))
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
 			}
 		}
 
