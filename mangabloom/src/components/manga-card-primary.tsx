@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Manga } from "@/lib/mangaSchema";
+import { Link } from "react-router";
 
 // I have decided to use useEffect just for this particular component because the cache control on this particular cove rimage is set by the server
 export default function MangaCardPrimary({ data }: {data : Manga}) {
@@ -19,7 +20,7 @@ export default function MangaCardPrimary({ data }: {data : Manga}) {
     // Function to fetch image with custom headers using axios
     const fetchImageWithHeaders = async (cover_image: string) => {
       try {
-        const response = await axios.get("https://47c9-132-145-103-138.ngrok-free.app" + "/covers/" + cover_image, {
+        const response = await axios.get("https://14ee-132-145-103-138.ngrok-free.app" + "/covers/" + cover_image, {
           headers: {
             'ngrok-skip-browser-warning': 'true',  // Custom header to skip ngrok browser warning
           },
@@ -40,6 +41,7 @@ export default function MangaCardPrimary({ data }: {data : Manga}) {
   }, [data.cover_image]);
 
   return (
+    <Link to={`/manga/${data.id}`} className="cursor-pointer">
     <Card className="w-full max-w-xs mx-auto overflow-hidden group hover:shadow-xl transition-shadow duration-300 bg-background">
       <div className="w-full">
         <img
@@ -65,5 +67,6 @@ export default function MangaCardPrimary({ data }: {data : Manga}) {
         </CardFooter>
       )}
     </Card>
+    </Link>
   );
 }

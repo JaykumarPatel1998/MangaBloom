@@ -10,12 +10,13 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
-import { BrowserRouter } from "react-router";
+import { BrowserRouter, Routes, Route } from "react-router";
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools"
 import Homepage from "@/pages/HomePage";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { indexedDBPersister } from "./lib/indexedDbPersister";
 import { Analytics } from "@vercel/analytics/react"
+import MangaPage from "./pages/MangaPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,10 +54,18 @@ function App() {
 
 
         <QueryClientProvider client={queryClient}>
+
           <ReactQueryDevtools initialIsOpen={false}/>
+
           <BrowserRouter>
-            <Homepage/>
+            <Routes>
+              <Route index element={<Homepage/>} />
+              <Route path="manga">
+                <Route path=":id" element={<MangaPage />} />
+              </Route>
+            </Routes>
           </BrowserRouter>
+
         </QueryClientProvider>
         
       </div>

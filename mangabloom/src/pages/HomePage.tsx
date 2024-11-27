@@ -10,9 +10,9 @@ import {
 import MangaCardPrimary from "@/components/manga-card-primary";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import CommandCustomFiltering from "@/components/command-custom-filtering";
 import { useState } from "react";
 import { validateMangaArray } from "@/lib/mangaSchema";
+import Navbar from "@/components/Navbar";
 
 export default function Homepage() {
   const [offset, setOffset] = useState<number>(0);
@@ -22,7 +22,7 @@ export default function Homepage() {
     queryKey: ["mangalist", offset],
     queryFn : async () => {
         // Make the API request
-        const res = await axios.get("https://47c9-132-145-103-138.ngrok-free.app/mangas", {
+        const res = await axios.get("https://14ee-132-145-103-138.ngrok-free.app/mangas", {
           params : {
             offset : offset * limit,
             limit : limit
@@ -43,14 +43,10 @@ export default function Homepage() {
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-2 relative">
-        <img src="manga-bloom.webp" alt="manga bloom logo" className="w-[300px]"/>
-        {/* search results goes here */}
-        <CommandCustomFiltering className="rounded-lg border shadow-md"/>
-      </div>
 
       {/*main content goes here */}
       <main>
+        <Navbar/>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {data.map((item) => (
             <MangaCardPrimary
@@ -61,6 +57,8 @@ export default function Homepage() {
         </div>
         <div>{isFetching ? 'Updating...' : ''}</div>
       </main>
+
+      {/* <MangaPage/> */}
 
       <Pagination className="cursor-pointer">
         <PaginationContent>
