@@ -73,7 +73,13 @@ func main() {
 		file := c.Param("*")
 		filePath := "./covers/" + file
 
-		// Set headers
+		// Check if the file exists
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			// Return a 404 error without caching
+			return echo.NewHTTPError(http.StatusNotFound, "File not found")
+		}
+
+		// Set Cache-Control headers only for successful responses
 		c.Response().Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 
 		// Serve the file
