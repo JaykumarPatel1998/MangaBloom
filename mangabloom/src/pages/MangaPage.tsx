@@ -12,7 +12,8 @@ import { useEffect, useState } from "react"
 import Navbar from "@/components/Navbar";
 
 export default function MangaPage() {
-  const {id} : {id : string} = useParams();
+  const { id } = useParams<{ id?: string }>();
+
   const be_url = "https://14ee-132-145-103-138.ngrok-free.app"
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
