@@ -4,6 +4,12 @@
 
 @layer base {
   :root {
+    /* font sizes are defined here */
+    --font-size-base: clamp(1rem, 1vw + 0.5rem, 1.25rem); /* Adjust as needed */
+    --font-size-lg: clamp(1.25rem, 1vw + 0.75rem, 1.5rem);
+    --font-size-sm: clamp(0.875rem, 0.5vw + 0.5rem, 1rem);
+    --font-size-xl: clamp(1.5rem, 1.5vw + 1rem, 2rem);
+
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --muted: 210 40% 96.1%;
@@ -76,19 +82,26 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased;
+    font-size: var(--font-size-base);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
-}
 
-@layer base {
-  * {
-    @apply border-border;
+  h1 {
+    font-size: var(--font-size-xl);
   }
-  body {
-    @apply bg-background text-foreground;
+
+  h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  p {
+    font-size: var(--font-size-base);
+  }
+
+  small {
+    font-size: var(--font-size-sm);
   }
 }

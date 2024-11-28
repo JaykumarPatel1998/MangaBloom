@@ -88,28 +88,30 @@ export default function MangaPage() {
               />
             </CardContent>
           </Card>
-          <div className="mt-4 space-y-2">
-            <Badge variant="outline">{data.status}</Badge>
-            <Badge variant="outline">{data.original_language}</Badge>
-          </div>
         </div>
 
         {/* Manga Details */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl font-bold">{mainTitle}</CardTitle>
+              <CardTitle className="font-bold">{mainTitle}</CardTitle>
               <CardDescription>
                 {data.manga_titles.filter(title => title.title !== mainTitle).map((title, index) => (
-                  <span key={index} className="block text-sm">
+                  <span key={index} className="block">
                     {title.title} ({title.language_code})
                   </span>
                 ))}
               </CardDescription>
             </CardHeader>
           </Card>
+          <div className="mt-4 space-y-2">
+            <Badge variant="outline">{data.status}</Badge>
+            <Badge variant="outline">{data.original_language}</Badge>
+          </div>
+        </div>
 
-          <Card>
+        <div className="lg:col-span-3 space-y-6">
+        <Card>
             <CardHeader>
               <CardTitle>Description</CardTitle>
             </CardHeader>
@@ -163,7 +165,7 @@ export default function MangaPage() {
                               <li key={index} className="flex justify-between items-center">
                                 <a target="_blank" href={`https://mangadex.org/chapter/${chapter.chapter_id}`} className="hover:underline">
                                   Chapter {chapter.chapter} &#8627;
-                                  {chapter.title && <span className="ml-2 text-sm text-muted-foreground">- {chapter.title}</span>}
+                                  {chapter.title && <span className="ml-2 text-muted-foreground">- {chapter.title}</span>}
                                 </a>
                               </li>
                             ))}
@@ -181,7 +183,7 @@ export default function MangaPage() {
                         <li key={index} className="flex justify-between items-center">
                           <a target="_blank" href={`https://mangadex.org/chapter/${chapter.chapter_id}`} className="hover:underline">
                             Chapter {chapter.chapter} &#8627;
-                            {chapter.title && <span className="ml-2 text-sm text-muted-foreground">- {chapter.title}</span>}
+                            {chapter.title && <span className="ml-2 text-muted-foreground">- {chapter.title}</span>}
                           </a>
                         </li>
                       ))}
@@ -190,10 +192,10 @@ export default function MangaPage() {
               )}
             </CardContent>
           </Card>
-
-          <div>{isFetching ? 'Updating...' : ''}</div>
+ 
         </div>
       </div>
+      <div>{isFetching ? 'Updating...' : ''}</div>
     </div>
   )
 }

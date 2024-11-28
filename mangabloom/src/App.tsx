@@ -67,7 +67,11 @@ function App() {
           </BrowserRouter>
 
         </QueryClientProvider>
-        
+
+        <footer>
+          <p>Powered by <a href="https://mangadex.org" target="_blank" rel="noreferrer">mangadex.org</a></p>
+          <img src="https://mangadex.org/img/brand/mangadex-wordmark.svg" alt="mangadex logo" className="w-[300px] bg-[#e0795f]"/>
+        </footer>
       </div>
     </SidebarProvider>
   );

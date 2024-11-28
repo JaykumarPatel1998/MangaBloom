@@ -60,7 +60,13 @@ module.exports = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+		fontSize: {
+			base: 'var(--font-size-base)',
+			lg: 'var(--font-size-lg)',
+			sm: 'var(--font-size-sm)',
+			xl: 'var(--font-size-xl)',
+		},
   	}
   },
   plugins: [require("tailwindcss-animate")],
