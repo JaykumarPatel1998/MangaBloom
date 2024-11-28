@@ -113,9 +113,10 @@ func SeedDatabase() {
 		var manga_artists []MangaArtist
 		var cover_images []string
 		var descriptions []Description
+		var manga_tags []MangaTag
 
 		fmt.Println("fetching manga page number: ", page)
-		err := FetchMangaListWithPagination(client, &mangaList, &titleList, &tags, &authors, &artists, &manga_authors, &manga_artists, &cover_images, &descriptions, page)
+		err := FetchMangaListWithPagination(client, &mangaList, &titleList, &tags, &authors, &artists, &manga_authors, &manga_artists, &cover_images, &descriptions, &manga_tags, page)
 		if err != nil {
 			fmt.Println("Error fetching manga list:", err)
 			return
@@ -235,6 +236,22 @@ func SeedDatabase() {
 						return
 					}
 				}
+			}
+		}
+
+		for _, tag := range tags {
+			err := db_cfg.DB.InsertTag(context.Background(), database.InsertTagParams(tag))
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+		}
+
+		for _, manga_tag := range manga_tags {
+			err := db_cfg.DB.InsertMangaTag(context.Background(), database.InsertMangaTagParams(manga_tag))
+			if err != nil {
+				log.Fatal(err)
+				return
 			}
 		}
 

@@ -36,7 +36,7 @@ func keyExistsInMapThenReturnSQLNullString(entityMap *map[string]string, key str
 func FetchMangaListWithPagination(client *http.Client, mangalist *[]Manga, titleList *[]Title,
 	tags *[]Tag, authors *[]Author, artists *[]Artist, manga_authors *[]MangaAuthor,
 	manga_artists *[]MangaArtist, cover_images *[]string,
-	descriptions *[]Description, page int) error {
+	descriptions *[]Description, mangaTags *[]MangaTag, page int) error {
 
 	url := fmt.Sprintf("%vmanga?limit=100&offset=%v&order[latestUploadedChapter]=desc", mangadex_api_url, page*100)
 	fmt.Println("fetching url : ", url)
@@ -90,6 +90,7 @@ func FetchMangaListWithPagination(client *http.Client, mangalist *[]Manga, title
 		populateMangaAuthors(mangaRes, manga_authors)
 		populateMangaArtists(mangaRes, manga_artists)
 		populateCoverArt(mangaRes, cover_images)
+		populateTags(mangaRes, tags, mangaTags)
 		*mangalist = append(*mangalist, manga)
 	}
 	return nil
@@ -108,34 +109,34 @@ func populateTitles(mangaResponse dto.MangaResponse, titleList *[]Title) {
 	}
 
 	for language_code, title := range mangaResponse.Attributes.Title {
-		title := Title{
+		title_temp := Title{
 			MangaID:      uuid.NullUUID{UUID: uuidParser(mangaResponse.ID), Valid: true},
 			LanguageCode: sql.NullString{String: language_code, Valid: true},
 			Title:        sql.NullString{String: title, Valid: true},
 		}
-		*titleList = append(*titleList, title)
+		*titleList = append(*titleList, title_temp)
 	}
 }
 
 func populateDescriptions(mangaResponse dto.MangaResponse, descriptionList *[]Description) {
 	for language_code, description := range mangaResponse.Attributes.Description {
-		description := Description{
+		description_temp := Description{
 			MangaID:      uuid.NullUUID{UUID: uuidParser(mangaResponse.ID), Valid: true},
 			LanguageCode: sql.NullString{String: language_code, Valid: true},
 			Description:  sql.NullString{String: description, Valid: true},
 		}
-		*descriptionList = append(*descriptionList, description)
+		*descriptionList = append(*descriptionList, description_temp)
 	}
 }
 
 func populateAuthors(mangaResponse dto.MangaResponse, authorList *[]Author) {
 	for _, author := range mangaResponse.Relationships {
 		if author.Type == "author" {
-			author := Author{
+			author_temp := Author{
 				ID:   uuidParser(author.ID),
 				Name: author.ID,
 			}
-			*authorList = append(*authorList, author)
+			*authorList = append(*authorList, author_temp)
 		}
 	}
 }
@@ -143,11 +144,11 @@ func populateAuthors(mangaResponse dto.MangaResponse, authorList *[]Author) {
 func populateArtists(mangaResponse dto.MangaResponse, artistList *[]Artist) {
 	for _, artist := range mangaResponse.Relationships {
 		if artist.Type == "artist" {
-			artist := Artist{
+			artist_temp := Artist{
 				ID:   uuidParser(artist.ID),
 				Name: artist.ID,
 			}
-			*artistList = append(*artistList, artist)
+			*artistList = append(*artistList, artist_temp)
 		}
 	}
 }
@@ -187,5 +188,23 @@ func populateCoverArt(mangaResponse dto.MangaResponse, coverList *[]string) {
 			coverFetchUrl := fmt.Sprintf("https://api.mangadex.org/cover/%v", coverID)
 			*coverList = append(*coverList, coverFetchUrl)
 		}
+	}
+}
+
+func populateTags(mangaResponse dto.MangaResponse, tags *[]Tag, mangaTags *[]MangaTag) {
+	for _, tag := range mangaResponse.Attributes.Tags {
+		tag_temp := Tag{
+			ID:          uuidParser(tag.ID),
+			Name:        keyExistsInMapThenReturnSQLNullString(&tag.Attributes.Name, "en"),
+			Description: keyExistsInMapThenReturnSQLNullString(&tag.Attributes.Description, "en"),
+			GroupName:   sql.NullString{String: tag.Attributes.Group, Valid: true},
+			Version:     sql.NullInt32{Int32: int32(tag.Attributes.Version), Valid: true},
+		}
+		mangaTag := MangaTag{
+			MangaID: uuidParser(mangaResponse.ID),
+			TagID:   tag_temp.ID,
+		}
+		*tags = append(*tags, tag_temp)
+		*mangaTags = append(*mangaTags, mangaTag)
 	}
 }
