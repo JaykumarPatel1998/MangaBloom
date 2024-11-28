@@ -34,7 +34,7 @@ export default function MangaPage() {
 
   useEffect(() => {
     let cover_image: string;
-    const match = data?.cover_images[0].file_path.match(/\/([^/]+\.256\.jpg)$/);
+    const match = data?.cover_images[0].file_path?.match(/\/([^/]+\.256\.jpg)$/);
     if (match) {
       console.log(match[1]); // Output: be3ea405-a17a-46d1-b0c4-caad9d2df100.jpg
       cover_image = be_url+ "/covers/" + match[1]
@@ -72,11 +72,11 @@ export default function MangaPage() {
   const mainTitle = data.manga_titles.find(title => title.language_code === data.original_language)?.title || data.manga_titles[0].title
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <Navbar/>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cover Image */}
-        <div className="md:col-span-1">
+        <div className="lg:col-span-1">
           <Card>
             <CardContent className="p-2">
               <img 
@@ -95,7 +95,7 @@ export default function MangaPage() {
         </div>
 
         {/* Manga Details */}
-        <div className="md:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="text-3xl font-bold">{mainTitle}</CardTitle>
@@ -114,16 +114,16 @@ export default function MangaPage() {
               <CardTitle>Description</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue={data.manga_descriptions[0].language_code}>
+              <Tabs defaultValue={data.manga_descriptions[0].language_code!}>
                 <TabsList>
                   {data.manga_descriptions.map((desc, index) => (
-                    <TabsTrigger key={index} value={desc.language_code}>
+                    <TabsTrigger key={index} value={desc.language_code!}>
                       {desc.language_code}
                     </TabsTrigger>
                   ))}
                 </TabsList>
                 {data.manga_descriptions.map((desc, index) => (
-                  <TabsContent key={index} value={desc.language_code}>
+                  <TabsContent key={index} value={desc.language_code!}>
                     <ScrollArea className="h-[200px] w-full rounded-md border p-4">
                       {desc.description}
                     </ScrollArea>

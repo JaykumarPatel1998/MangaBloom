@@ -43,7 +43,7 @@ function App() {
       <Analytics/>
       <AppSidebar />
 
-      <div className="container">
+      <div className="w-full">
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>

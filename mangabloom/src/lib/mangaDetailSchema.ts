@@ -10,30 +10,30 @@ const ChapterSchema = z.object({
 });
 
 const CoverImageSchema = z.object({
-  id: z.string().uuid(),
-  file_path: z.string().url(),
+  id: z.string().uuid().nullable(),
+  file_path: z.string().url().nullable(),
 });
 
 const MangaDescriptionSchema = z.object({
-  description: z.string(),
-  language_code: z.string(),
+  description: z.string().nullable(),
+  language_code: z.string().nullable(),
 });
 
 const MangaTitleSchema = z.object({
-  title: z.string(),
-  language_code: z.string(),
+  title: z.string().nullable(),
+  language_code: z.string().nullable(),
 });
 
 // Main schema for the overall JSON structure
 const MangaSchema = z.object({
-  artists: z.string(),
-  authors: z.string(),
+  artists: z.string().nullable(),
+  authors: z.string().nullable(),
   chapters: z.array(ChapterSchema),
   cover_images: z.array(CoverImageSchema),
   manga_descriptions: z.array(MangaDescriptionSchema),
   manga_id: z.string().uuid(),
   manga_titles: z.array(MangaTitleSchema),
-  original_language: z.string(),
+  original_language: z.string().nullable(),
   status: z.string(),
 });
 
