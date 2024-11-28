@@ -140,7 +140,7 @@ export default function MangaPage() {
             <CardContent>
               {data.chapters.some(chapter => chapter.volume !== null) ? (
                 <Tabs defaultValue={data.chapters[0].volume || "no-volume"}>
-                  <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 min-h-max">
+                  <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-32 overflow-y-auto">
                     {Array.from(new Set(data.chapters.map(chapter => chapter.volume))).sort(
                       (volume1, volume2) => {
                         if (volume1 === "no-volume" || volume2 === "no-volume") return -1
