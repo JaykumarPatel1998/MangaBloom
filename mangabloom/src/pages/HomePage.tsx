@@ -79,6 +79,39 @@ export default function Homepage() {
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+
+       {/* Hero Section */}
+  <section className="hero bg-gray-100 py-10 text-center">
+    <h1 className="text-4xl font-bold text-gray-800">Discover Manga Bloom</h1>
+    <p className="text-lg text-gray-600 mt-4">
+      Discover your favorite manga in an ad-free, legal platform. Enjoy a vast library of high-quality manga with seamless navigation and the latest updates.
+    </p>
+  </section>
+
+  {/* Features Section */}
+  <section className="features bg-white py-10">
+    <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Why Choose Manga Bloom?</h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+      <div className="feature-card bg-gray-50 p-4 rounded shadow">
+        <h3 className="text-xl font-semibold text-gray-700">Ad-Free Experience</h3>
+        <p className="text-gray-600 mt-2">
+          Read manga without interruptions. Our platform is designed for a seamless and enjoyable reading experience.
+        </p>
+      </div>
+      <div className="feature-card bg-gray-50 p-4 rounded shadow">
+        <h3 className="text-xl font-semibold text-gray-700">Legal and Ethical</h3>
+        <p className="text-gray-600 mt-2">
+          Support manga creators by using a platform that prioritizes legality and fair use.
+        </p>
+      </div>
+      <div className="feature-card bg-gray-50 p-4 rounded shadow">
+        <h3 className="text-xl font-semibold text-gray-700">High-Quality Manga</h3>
+        <p className="text-gray-600 mt-2">
+          Browse a library of high-resolution manga chapters, carefully curated for manga enthusiasts.
+        </p>
+      </div>
+    </div>
+  </section>
     </div>
   );
 }
